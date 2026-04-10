@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import layout from '../styles/layout.module.css';
+import styles from '../styles/auth.module.css';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,41 +16,40 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="page-wrapper">
+    <div className={layout.pageWrapper}>
       <Header />
-      <main className="main-content">
-        <div className="auth-page">
-          <div className="auth-card">
+      <main className={layout.mainContent}>
+        <div className={styles.authPage}>
+          <div className={styles.authCard}>
             <h2>С возвращением</h2>
             <p>Войдите, чтобы управлять своими капсулами</p>
-            
-            <form className="auth-form" onSubmit={handleSubmit}>
-              <input 
-                type="email" 
-                placeholder="Email адрес" 
+
+            <form className={styles.authForm} onSubmit={handleSubmit}>
+              <input
+                type="email"
+                placeholder="Email адрес"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required 
+                required
               />
-              <input 
-                type="password" 
-                placeholder="Пароль" 
+              <input
+                type="password"
+                placeholder="Пароль"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required 
+                required
               />
-              <button type="submit" className="btn-primary" style={{ width: '100%' }}>
+              <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
                 Войти
               </button>
             </form>
 
-            <Link to="#" className="forgot-link">
+            <Link to="#" className={styles.forgotLink}>
               Забыли пароль?
             </Link>
-            
-            <p className="auth-note">
-              Нет аккаунта?{' '}
-              <Link to="/register">Зарегистрироваться</Link>
+
+            <p className={styles.authNote}>
+              Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
             </p>
           </div>
         </div>
@@ -70,44 +71,43 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="page-wrapper">
+    <div className={layout.pageWrapper}>
       <Header />
-      <main className="main-content">
-        <div className="auth-page">
-          <div className="auth-card">
+      <main className={layout.mainContent}>
+        <div className={styles.authPage}>
+          <div className={styles.authCard}>
             <h2>Регистрация</h2>
             <p>Присоединяйтесь к хранилищу воспоминаний</p>
-            
-            <form className="auth-form" onSubmit={handleSubmit}>
-              <input 
-                type="text" 
-                placeholder="Ваше имя" 
+
+            <form className={styles.authForm} onSubmit={handleSubmit}>
+              <input
+                type="text"
+                placeholder="Ваше имя"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                required 
+                required
               />
-              <input 
-                type="email" 
-                placeholder="Email адрес" 
+              <input
+                type="email"
+                placeholder="Email адрес"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required 
+                required
               />
-              <input 
-                type="password" 
-                placeholder="Пароль" 
+              <input
+                type="password"
+                placeholder="Пароль"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required 
+                required
               />
-              <button type="submit" className="btn-primary" style={{ width: '100%' }}>
+              <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
                 Создать аккаунт
               </button>
             </form>
-            
-            <p className="auth-note">
-              Уже есть аккаунт?{' '}
-              <Link to="/login">Войти</Link>
+
+            <p className={styles.authNote}>
+              Уже есть аккаунт? <Link to="/login">Войти</Link>
             </p>
           </div>
         </div>

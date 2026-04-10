@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Catalog from './pages/Catalog';
 import Landing from './pages/Landing';
 import Catalog from './pages/Catalog';
 import { LoginPage, RegisterPage } from './pages/Auth';

@@ -1,6 +1,7 @@
 import React from 'react';
 import ProductCard from './ProductCard';
 import { Product } from '../data/products';
+import styles from '../styles/productCard.module.css';
 
 interface ProductListProps {
   products: Product[];
@@ -9,8 +10,8 @@ interface ProductListProps {
 
 const ProductList: React.FC<ProductListProps> = ({ products, onLike }) => {
   return (
-    <div className="product-grid">
-      {products.map(product => (
+    <div className={styles.productGrid}>
+      {products.map((product) => (
         <ProductCard
           key={product.id}
           id={product.id}

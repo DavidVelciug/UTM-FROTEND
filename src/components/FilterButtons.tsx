@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from '../styles/filterButtons.module.css';
 
 interface FilterButtonsProps {
   categories: string[];
@@ -6,17 +7,14 @@ interface FilterButtonsProps {
   onFilterChange: (filter: string) => void;
 }
 
-const FilterButtons: React.FC<FilterButtonsProps> = ({ 
-  categories, 
-  activeFilter, 
-  onFilterChange 
-}) => {
+const FilterButtons: React.FC<FilterButtonsProps> = ({ categories, activeFilter, onFilterChange }) => {
   return (
-    <div className="filter-buttons">
-      {categories.map(category => (
+    <div className={styles.filterButtons}>
+      {categories.map((category) => (
         <button
           key={category}
-          className={`filter-btn ${activeFilter === category ? 'active' : ''}`}
+          type="button"
+          className={`${styles.filterBtn} ${activeFilter === category ? styles.filterBtnActive : ''}`}
           onClick={() => onFilterChange(category)}
         >
           {category}

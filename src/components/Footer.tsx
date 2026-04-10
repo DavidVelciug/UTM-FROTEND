@@ -1,38 +1,54 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import styles from '../styles/footer.module.css';
 
 const Footer: React.FC = () => {
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-section">
+    <footer className={styles.footer}>
+      <div className={styles.footerContent}>
+        <div className={styles.footerSection}>
           <h3>MemoryLane</h3>
           <p>Сохраняйте воспоминания для будущих поколений</p>
           <p>📍 Москва, Россия</p>
           <p>📧 info@memorylane.com</p>
         </div>
 
-        <div className="footer-section">
+        <div className={styles.footerSection}>
           <h3>Навигация</h3>
           <ul>
-            <li><a href="/">Главная</a></li>
-            <li><a href="/catalog">Каталог</a></li>
-            <li><a href="/favorites">Избранное</a></li>
-            <li><a href="/about">О нас</a></li>
+            <li>
+              <Link to="/">Главная</Link>
+            </li>
+            <li>
+              <Link to="/catalog">Каталог</Link>
+            </li>
+            <li>
+              <Link to="/feed">Публичная лента</Link>
+            </li>
+            <li>
+              <Link to="/map">Карта</Link>
+            </li>
           </ul>
         </div>
 
-        <div className="footer-section">
+        <div className={styles.footerSection}>
           <h3>Помощь</h3>
           <ul>
-            <li><a href="/faq">FAQ</a></li>
-            <li><a href="/support">Поддержка</a></li>
-            <li><a href="/privacy">Конфиденциальность</a></li>
+            <li>
+              <a href="/faq">FAQ</a>
+            </li>
+            <li>
+              <a href="/support">Поддержка</a>
+            </li>
+            <li>
+              <a href="/privacy">Конфиденциальность</a>
+            </li>
           </ul>
         </div>
       </div>
 
-      <div className="footer-bottom">
-        <p>&copy; 2024 MemoryLane. Все права защищены.</p>
+      <div className={styles.footerBottom}>
+        <p>&copy; 2026 MemoryLane. Все права защищены.</p>
       </div>
     </footer>
   );
