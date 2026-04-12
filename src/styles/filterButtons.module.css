@@ -1,0 +1,35 @@
+.filterButtons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filterBtn {
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: var(--surface-light);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+  font-size: 0.95rem;
+}
+
+.filterBtn:hover {
+  border-color: var(--primary);
+}
+
+.filterBtnActive {
+  background: var(--gradient-primary);
+  border: none;
+}
+
+@media (max-width: 480px) {
+  .filterBtn {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+}
