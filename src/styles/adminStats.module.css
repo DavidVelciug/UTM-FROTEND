@@ -1,0 +1,49 @@
+.chartGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.chartCard {
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.25rem;
+}
+
+.chartTitle {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--text-dim);
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 88px 1fr 40px;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.barTrack {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.barFill {
+  height: 100%;
+  background: var(--gradient-primary);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
