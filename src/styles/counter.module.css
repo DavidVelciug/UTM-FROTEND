@@ -1,0 +1,16 @@
+.counter {
+  background: var(--surface-light);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  display: inline-block;
+  margin: 0 auto;
+  font-size: 0.95rem;
+}
+
+.counter span {
+  color: var(--primary);
+  font-weight: 700;
+  margin: 0 0.3rem;
+}
