@@ -70,6 +70,53 @@
   font-size: 0.95rem;
 }
 
+.sectionsMenu {
+  position: relative;
+}
+
+.menuSummary {
+  list-style: none;
+  cursor: pointer;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid rgba(139, 92, 246, 0.4);
+  border-radius: 10px;
+  background: rgba(15, 15, 45, 0.75);
+}
+
+.menuSummary::-webkit-details-marker {
+  display: none;
+}
+
+.menuItems {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 220px;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.6rem;
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  border-radius: 12px;
+  background: rgba(8, 8, 23, 0.95);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.menuItem {
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.menuItem:hover {
+  color: var(--primary);
+  background: rgba(139, 92, 246, 0.12);
+}
+
 @media (max-width: 768px) {
   .headerContent {
     flex-direction: column;
@@ -77,5 +124,10 @@
 
   .navLinks {
     justify-content: center;
+  }
+
+  .menuItems {
+    right: auto;
+    left: 0;
   }
 }
