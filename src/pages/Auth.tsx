@@ -4,14 +4,17 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/auth.module.css';
+import { setRole, type AppRole } from '../auth/session';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setSelectedRole] = useState<AppRole>('user');
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setRole(role);
     navigate('/catalog');
   };
 
@@ -39,6 +42,11 @@ export const LoginPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <select value={role} onChange={(e) => setSelectedRole(e.target.value as AppRole)} required>
+                <option value="user">Пользователь</option>
+                <option value="moderator">Модератор</option>
+                <option value="admin">Администратор</option>
+              </select>
               <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
                 Войти
               </button>
@@ -63,10 +71,12 @@ export const RegisterPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setSelectedRole] = useState<AppRole>('user');
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setRole(role);
     navigate('/login');
   };
 
@@ -101,6 +111,11 @@ export const RegisterPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <select value={role} onChange={(e) => setSelectedRole(e.target.value as AppRole)} required>
+                <option value="user">Пользователь</option>
+                <option value="moderator">Модератор</option>
+                <option value="admin">Администратор</option>
+              </select>
               <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
                 Создать аккаунт
               </button>
