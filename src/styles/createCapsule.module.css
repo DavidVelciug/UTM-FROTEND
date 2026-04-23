@@ -1,0 +1,51 @@
+.createCapsuleCard {
+  position: relative;
+  overflow: hidden;
+}
+
+.createCapsuleCard::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.16), transparent 60%);
+  pointer-events: none;
+}
+
+.heroPanel {
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.heroPanel h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+}
+
+.heroPanel p {
+  margin: 0;
+  color: var(--text-dim);
+}
+
+.locationPanel {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.mapWrap {
+  height: 280px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.coords {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
