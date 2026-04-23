@@ -1,12 +1,43 @@
 import React, { useState } from 'react';
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+import 'leaflet/dist/leaflet.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
 import page from '../styles/pageSection.module.css';
-import { DEMO_USER_ID, fetchJson } from '../config/api';
-import type { CapsuleContentType, ResponceMsg } from '../types/api';
+import styles from '../styles/createCapsule.module.css';
+import { fetchJson } from '../config/api';
+import { getCurrentUserId } from '../auth/session';
+import type { CapsuleContentType, ResponceMsg, TimeCapsuleDto } from '../types/api';
+
+const DefaultIcon = L.icon({
+  iconRetinaUrl: iconRetina,
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+type LocationPickerProps = {
+  onPick: (lat: number, lng: number) => void;
+};
+
+const LocationPicker: React.FC<LocationPickerProps> = ({ onPick }) => {
+  useMapEvents({
+    click(e) {
+      onPick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+};
 
 const CreateCapsule: React.FC = () => {
+  const userId = getCurrentUserId();
   const [contentType, setContentType] = useState<CapsuleContentType>(0);
   const [title, setTitle] = useState('');
   const [textContent, setTextContent] = useState('');
@@ -15,6 +46,10 @@ const CreateCapsule: React.FC = () => {
   const [openAt, setOpenAt] = useState('');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [isPublic, setIsPublic] = useState(false);
+  const [useLocation, setUseLocation] = useState(true);
+  const [latitude, setLatitude] = useState<number | null>(55.7558);
+  const [longitude, setLongitude] = useState<number | null>(37.6176);
+  const [placeLabel, setPlaceLabel] = useState('');
   const [status, setStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -23,10 +58,15 @@ const CreateCapsule: React.FC = () => {
     setLoading(true);
     setStatus(null);
     try {
+      if (!userId) {
+        setStatus('Сначала выполните вход, затем создавайте капсулы.');
+        return;
+      }
+
       const openAtUtc = new Date(openAt).toISOString();
       const body = {
         id: 0,
-        ownerUserId: DEMO_USER_ID,
+        ownerUserId: userId,
         contentType,
         title,
         textContent: contentType === 0 ? textContent : null,
@@ -41,7 +81,34 @@ const CreateCapsule: React.FC = () => {
         method: 'POST',
         body: JSON.stringify(body),
       });
-      setStatus(res.isSuccess ? `✓ ${res.message}` : `✗ ${res.message}`);
+      if (!res.isSuccess) {
+        setStatus(`✗ ${res.message}`);
+        return;
+      }
+
+      if (useLocation && latitude !== null && longitude !== null) {
+        const ownerCapsules = await fetchJson<TimeCapsuleDto[]>(
+          `/api/timecapsule/getByOwner?ownerUserId=${userId}`,
+        );
+        const createdCapsule = ownerCapsules
+          .filter((c) => c.title === title)
+          .sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime())[0];
+
+        if (createdCapsule) {
+          await fetchJson<ResponceMsg>('/api/capsulelocation', {
+            method: 'POST',
+            body: JSON.stringify({
+              id: 0,
+              capsuleId: createdCapsule.id,
+              latitude,
+              longitude,
+              placeLabel: placeLabel || `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`,
+            }),
+          });
+        }
+      }
+
+      setStatus('✓ Капсула создана и сохранена.');
     } catch (err: unknown) {
       setStatus(err instanceof Error ? err.message : 'Ошибка запроса');
     } finally {
@@ -55,10 +122,14 @@ const CreateCapsule: React.FC = () => {
       <main className={layout.mainContent}>
         <div className={page.pageHeader}>
           <h1>Создание капсулы</h1>
-          <p>Выберите тип содержимого, дату открытия и адресата — мы запечатаем сообщение.</p>
+          <p>Запечатайте сообщение, добавьте место на карте и откройте его в будущем.</p>
         </div>
         <div className={page.section}>
-          <div className={`${page.card} ${layout.container}`}>
+          <div className={`${page.card} ${layout.container} ${styles.createCapsuleCard}`}>
+            <div className={styles.heroPanel}>
+              <h2>Новая капсула</h2>
+              <p>Заполните данные и при желании прикрепите точку на карте.</p>
+            </div>
             <form className={page.formGrid} onSubmit={handleSubmit}>
               <label className={page.label}>
                 Тип капсулы
@@ -139,6 +210,46 @@ const CreateCapsule: React.FC = () => {
                   required
                 />
               </label>
+              <div className={styles.locationPanel}>
+                <label className={`${page.row} ${page.muted}`}>
+                  <input
+                    type="checkbox"
+                    checked={useLocation}
+                    onChange={(e) => setUseLocation(e.target.checked)}
+                  />
+                  Привязать капсулу к локации на карте
+                </label>
+                {useLocation && (
+                  <>
+                    <div className={styles.mapWrap}>
+                      <MapContainer
+                        center={[latitude ?? 55.7558, longitude ?? 37.6176]}
+                        zoom={10}
+                        style={{ height: '100%', width: '100%' }}
+                      >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <LocationPicker onPick={(lat, lng) => {
+                          setLatitude(lat);
+                          setLongitude(lng);
+                        }} />
+                        {latitude !== null && longitude !== null && <Marker position={[latitude, longitude]} />}
+                      </MapContainer>
+                    </div>
+                    <label className={page.label}>
+                      Название места
+                      <input
+                        className={page.input}
+                        value={placeLabel}
+                        onChange={(e) => setPlaceLabel(e.target.value)}
+                        placeholder="Например: Парк Горького, Москва"
+                      />
+                    </label>
+                    <div className={styles.coords}>
+                      Координаты: {latitude?.toFixed(5)}, {longitude?.toFixed(5)}
+                    </div>
+                  </>
+                )}
+              </div>
               <label className={`${page.row} ${page.muted}`}>
                 <input
                   type="checkbox"
