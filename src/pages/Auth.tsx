@@ -4,18 +4,42 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/auth.module.css';
-import { setRole, type AppRole } from '../auth/session';
+import { setCurrentUser, setRole, type AppRole } from '../auth/session';
+import { fetchJson } from '../config/api';
+import type { UserAccountDto, UserLoginResultDto } from '../types/api';
 
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setSelectedRole] = useState<AppRole>('user');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRole(role);
-    navigate('/catalog');
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await fetchJson<UserLoginResultDto>('/api/user/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, role }),
+      });
+      if (!result.isSuccess || !result.userId) {
+        setRole('guest');
+        setError(result.message || 'Пользователь не найден.');
+        return;
+      }
+
+      setRole(role);
+      setCurrentUser(result.userId, result.displayName);
+      navigate('/catalog');
+    } catch (err: unknown) {
+      setRole('guest');
+      setError(err instanceof Error ? err.message : 'Ошибка входа');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,9 +72,10 @@ export const LoginPage: React.FC = () => {
                 <option value="admin">Администратор</option>
               </select>
               <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
-                Войти
+                {loading ? 'Входим…' : 'Войти'}
               </button>
             </form>
+            {error && <p className={styles.authNote}>❌ {error}</p>}
 
             <Link to="#" className={styles.forgotLink}>
               Забыли пароль?
@@ -72,12 +97,42 @@ export const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setSelectedRole] = useState<AppRole>('user');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRole(role);
-    navigate('/login');
+    try {
+      setLoading(true);
+      setError(null);
+      const payload: UserAccountDto = {
+        id: 0,
+        email,
+        displayName: name,
+        role: role === 'guest' ? 'user' : role,
+        password,
+        createdAtUtc: new Date().toISOString(),
+        notifyEmailEnabled: true,
+        notifyPushEnabled: true,
+        loginAlertsEnabled: true,
+      };
+      const result = await fetchJson<{ isSuccess: boolean; message: string }>('/api/user', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (!result.isSuccess) {
+        setError(result.message);
+        return;
+      }
+
+      setRole('guest');
+      navigate('/login');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Ошибка регистрации');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -117,9 +172,10 @@ export const RegisterPage: React.FC = () => {
                 <option value="admin">Администратор</option>
               </select>
               <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
-                Создать аккаунт
+                {loading ? 'Создаём…' : 'Создать аккаунт'}
               </button>
             </form>
+            {error && <p className={styles.authNote}>❌ {error}</p>}
 
             <p className={styles.authNote}>
               Уже есть аккаунт? <Link to="/login">Войти</Link>
