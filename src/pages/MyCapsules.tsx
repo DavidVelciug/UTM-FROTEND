@@ -4,7 +4,8 @@ import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
 import page from '../styles/pageSection.module.css';
 import catalog from '../styles/catalog.module.css';
-import { DEMO_USER_ID, fetchJson } from '../config/api';
+import { fetchJson } from '../config/api';
+import { getCurrentUserId } from '../auth/session';
 import type { TimeCapsuleDto } from '../types/api';
 
 function formatCountdown(target: Date, now: Date): string {
@@ -18,6 +19,7 @@ function formatCountdown(target: Date, now: Date): string {
 }
 
 const MyCapsules: React.FC = () => {
+  const userId = getCurrentUserId();
   const [items, setItems] = useState<TimeCapsuleDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,9 +34,14 @@ const MyCapsules: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
+        if (!userId) {
+          setItems([]);
+          setError('Сначала выполните вход.');
+          return;
+        }
         setLoading(true);
         const data = await fetchJson<TimeCapsuleDto[]>(
-          `/api/timecapsule/getByOwner?ownerUserId=${DEMO_USER_ID}`,
+          `/api/timecapsule/getByOwner?ownerUserId=${userId}`,
         );
         if (!cancelled) {
           setItems(data);
@@ -49,7 +56,7 @@ const MyCapsules: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [userId]);
 
   const sorted = useMemo(
     () => [...items].sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime()),
@@ -62,7 +69,7 @@ const MyCapsules: React.FC = () => {
       <main className={layout.mainContent}>
         <div className={page.pageHeader}>
           <h1>Мои капсулы</h1>
-          <p>Запечатанные сообщения и таймер до даты открытия (демо-пользователь #{DEMO_USER_ID}).</p>
+          <p>Запечатанные сообщения и таймер до даты открытия для текущего аккаунта.</p>
         </div>
         <div className={`${page.section} ${layout.container}`}>
           {loading && (
