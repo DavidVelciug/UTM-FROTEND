@@ -10,6 +10,10 @@ import MemoryMap from './pages/MemoryMap';
 import ProfileSettings from './pages/ProfileSettings';
 import AdminModeration from './pages/AdminModeration';
 import AdminStats from './pages/AdminStats';
+import AdminUsers from './pages/AdminUsers';
+import OpenedCapsules from './pages/OpenedCapsules';
+import CapsuleView from './pages/CapsuleView';
+import FeedCapsuleView from './pages/FeedCapsuleView';
 import { canAccess, canUseExtendedFeatures, getRole } from './auth/session';
 
 type GuardType = 'extended' | 'moderation' | 'stats';
@@ -51,7 +55,13 @@ function App() {
           path="/my-capsules"
           element={<ProtectedRoute guard="extended" element={<MyCapsules />} />}
         />
+        <Route
+          path="/opened-capsules"
+          element={<ProtectedRoute guard="extended" element={<OpenedCapsules />} />}
+        />
+        <Route path="/capsule-view/:capsuleId" element={<ProtectedRoute guard="extended" element={<CapsuleView />} />} />
         <Route path="/feed" element={<ProtectedRoute guard="extended" element={<PublicFeed />} />} />
+        <Route path="/feed-capsule/:capsuleId" element={<ProtectedRoute guard="extended" element={<FeedCapsuleView />} />} />
         <Route path="/map" element={<ProtectedRoute guard="extended" element={<MemoryMap />} />} />
         <Route path="/settings" element={<ProfileSettings />} />
         <Route
@@ -59,6 +69,7 @@ function App() {
           element={<ProtectedRoute guard="moderation" element={<AdminModeration />} />}
         />
         <Route path="/admin/stats" element={<ProtectedRoute guard="stats" element={<AdminStats />} />} />
+        <Route path="/admin/users" element={<ProtectedRoute guard="stats" element={<AdminUsers />} />} />
       </Routes>
     </Router>
   );

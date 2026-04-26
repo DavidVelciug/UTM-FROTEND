@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import styles from '../styles/header.module.css';
 import layout from '../styles/layout.module.css';
 import { canAccess, canUseExtendedFeatures, getRole, logout } from '../auth/session';
+import { getAvatar } from '../auth/avatar';
 
 const Header: React.FC = () => {
   const role = getRole();
   const showExtended = canUseExtendedFeatures(role);
+  const avatar = getAvatar();
 
   return (
     <header className={styles.header}>
@@ -24,6 +26,11 @@ const Header: React.FC = () => {
           <Link to="/settings" className={styles.navLink}>
             Настройки
           </Link>
+          {showExtended && (
+            <Link to="/feed" className={styles.navLink}>
+              Лента
+            </Link>
+          )}
 
           {showExtended && (
             <details className={styles.sectionsMenu}>
@@ -35,8 +42,8 @@ const Header: React.FC = () => {
                 <Link to="/my-capsules" className={styles.menuItem}>
                   Мои капсулы
                 </Link>
-                <Link to="/feed" className={styles.menuItem}>
-                  Лента
+                <Link to="/opened-capsules" className={styles.menuItem}>
+                  Открытые капсулы
                 </Link>
                 <Link to="/map" className={styles.menuItem}>
                   Карта
@@ -51,6 +58,11 @@ const Header: React.FC = () => {
                     Статистика
                   </Link>
                 )}
+                {canAccess(role, 'stats') && (
+                  <Link to="/admin/users" className={styles.menuItem}>
+                    Пользователи
+                  </Link>
+                )}
               </div>
             </details>
           )}
@@ -60,13 +72,16 @@ const Header: React.FC = () => {
               Войти
             </Link>
           ) : (
-            <Link
-              to="/"
-              className={`${layout.btnPrimary} ${styles.navBtn}`}
-              onClick={() => logout()}
-            >
-              Выйти
-            </Link>
+            <div className={styles.userBlock}>
+              <img src={avatar} alt="avatar" className={styles.avatar} />
+              <Link
+                to="/"
+                className={`${layout.btnPrimary} ${styles.navBtn}`}
+                onClick={() => logout()}
+              >
+                Выйти
+              </Link>
+            </div>
           )}
         </nav>
       </div>
