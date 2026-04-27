@@ -7,16 +7,17 @@ interface ProductCardProps {
   price: number;
   image: string;
   description: string;
-  onLike: (id: number, liked: boolean) => void;
+  likesCount: number;
+  onLike: (id: number) => void;
+  onOpen: (id: number) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ id, name, price, image, description, onLike }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ id, name, price, image, description, likesCount, onLike, onOpen }) => {
   const [liked, setLiked] = useState<boolean>(false);
 
   const handleLike = () => {
-    const newLiked = !liked;
-    setLiked(newLiked);
-    onLike(id, newLiked);
+    setLiked(true);
+    onLike(id);
   };
 
   return (
@@ -30,8 +31,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ id, name, price, image, descr
           type="button"
           className={`${styles.likeBtn} ${liked ? styles.likeBtnLiked : ''}`}
           onClick={handleLike}
+          disabled={liked}
         >
-          {liked ? '❤️ В избранном' : '🤍 В избранное'}
+          ❤️ Лайки: {likesCount}
+        </button>
+        <button type="button" className={styles.likeBtn} onClick={() => onOpen(id)}>
+          Распаковать капсулу
         </button>
       </div>
     </div>
