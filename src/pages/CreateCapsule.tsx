@@ -47,6 +47,7 @@ const CreateCapsule: React.FC = () => {
   const [recipientEmail, setRecipientEmail] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [useLocation, setUseLocation] = useState(true);
+  const [capsuleMode, setCapsuleMode] = useState<'personal' | 'location' | 'feed'>('personal');
   const [latitude, setLatitude] = useState<number | null>(55.7558);
   const [longitude, setLongitude] = useState<number | null>(37.6176);
   const [placeLabel, setPlaceLabel] = useState('');
@@ -74,8 +75,8 @@ const CreateCapsule: React.FC = () => {
         fileStoragePath: contentType === 2 ? filePath : null,
         openAtUtc,
         createdAtUtc: new Date().toISOString(),
-        recipientEmail,
-        isPublic,
+        recipientEmail: capsuleMode === 'feed' ? 'feed@memorylane.local' : recipientEmail,
+        isPublic: capsuleMode === 'feed' ? true : isPublic,
       };
       const res = await fetchJson<ResponceMsg>('/api/timecapsule', {
         method: 'POST',
@@ -131,6 +132,28 @@ const CreateCapsule: React.FC = () => {
               <p>Заполните данные и при желании прикрепите точку на карте.</p>
             </div>
             <form className={page.formGrid} onSubmit={handleSubmit}>
+              <label className={page.label}>
+                Режим капсулы
+                <select
+                  className={page.select}
+                  value={capsuleMode}
+                  onChange={(e) => {
+                    const mode = e.target.value as 'personal' | 'location' | 'feed';
+                    setCapsuleMode(mode);
+                    if (mode === 'feed') {
+                      setUseLocation(false);
+                      setIsPublic(true);
+                    }
+                    if (mode === 'location') {
+                      setUseLocation(true);
+                    }
+                  }}
+                >
+                  <option value="personal">Личное</option>
+                  <option value="location">По локации (10 км)</option>
+                  <option value="feed">В ленту</option>
+                </select>
+              </label>
               <label className={page.label}>
                 Тип капсулы
                 <select
@@ -200,7 +223,8 @@ const CreateCapsule: React.FC = () => {
                   required
                 />
               </label>
-              <label className={page.label}>
+              {capsuleMode !== 'feed' && (
+                <label className={page.label}>
                 Email адресата
                 <input
                   className={page.input}
@@ -210,6 +234,7 @@ const CreateCapsule: React.FC = () => {
                   required
                 />
               </label>
+              )}
               <div className={styles.locationPanel}>
                 <label className={`${page.row} ${page.muted}`}>
                   <input

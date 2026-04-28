@@ -6,7 +6,7 @@ import page from '../styles/pageSection.module.css';
 import catalog from '../styles/catalog.module.css';
 import { fetchJson } from '../config/api';
 import { getCurrentUserId } from '../auth/session';
-import type { TimeCapsuleDto } from '../types/api';
+import type { ResponceMsg, TimeCapsuleDto } from '../types/api';
 
 function formatCountdown(target: Date, now: Date): string {
   const diff = target.getTime() - now.getTime();
@@ -24,6 +24,7 @@ const MyCapsules: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [now, setNow] = useState(() => new Date());
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -62,6 +63,19 @@ const MyCapsules: React.FC = () => {
     () => [...items].sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime()),
     [items],
   );
+
+  const saveCapsule = async (capsule: TimeCapsuleDto) => {
+    try {
+      const res = await fetchJson<ResponceMsg>('/api/timecapsule', {
+        method: 'PUT',
+        body: JSON.stringify(capsule),
+      });
+      setError(res.isSuccess ? null : res.message);
+      if (res.isSuccess) setEditingId(null);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Ошибка сохранения');
+    }
+  };
 
   return (
     <div className={layout.pageWrapper}>
@@ -103,10 +117,32 @@ const MyCapsules: React.FC = () => {
                       {sealed ? 'Запечатано' : 'Открыта'}
                     </span>
                   </div>
-                  <p className={page.muted}>
-                    Тип: {c.contentType === 0 ? 'Текст' : c.contentType === 1 ? 'Ссылка' : 'Файл'} · Получатель:{' '}
-                    {c.recipientEmail}
-                  </p>
+                  <p className={page.muted}>Тип: {c.contentType === 0 ? 'Текст' : c.contentType === 1 ? 'Ссылка' : 'Файл'}</p>
+                  {editingId === c.id ? (
+                    <div className={page.formGrid}>
+                      <input
+                        className={page.input}
+                        value={c.title}
+                        onChange={(e) =>
+                          setItems((prev) => prev.map((x) => (x.id === c.id ? { ...x, title: e.target.value } : x)))
+                        }
+                      />
+                      <input
+                        className={page.input}
+                        value={c.recipientEmail}
+                        onChange={(e) =>
+                          setItems((prev) =>
+                            prev.map((x) => (x.id === c.id ? { ...x, recipientEmail: e.target.value } : x)),
+                          )
+                        }
+                      />
+                      <button type="button" className={layout.btnPrimary} onClick={() => void saveCapsule(c)}>
+                        Сохранить
+                      </button>
+                    </div>
+                  ) : (
+                    <p className={page.muted}>Получатель: {c.recipientEmail}</p>
+                  )}
                   <p className={page.muted}>
                     Открытие: {open.toLocaleString('ru-RU')}
                     {sealed && (
@@ -116,6 +152,9 @@ const MyCapsules: React.FC = () => {
                       </>
                     )}
                   </p>
+                  <button type="button" className={layout.btnPrimary} onClick={() => setEditingId(c.id)}>
+                    Редактировать
+                  </button>
                 </div>
               );
             })}
