@@ -3,8 +3,6 @@ import { getRole } from '../auth/session';
 
 export const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
-export const DEMO_USER_ID = 1;
-
 export function apiUrl(path: string): string {
   const normalized = path.startsWith('/') ? path : `/${path}`;
   return `${API_BASE}${normalized}`;

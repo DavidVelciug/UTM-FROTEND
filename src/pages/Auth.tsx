@@ -11,7 +11,6 @@ import type { UserAccountDto, UserLoginResultDto } from '../types/api';
 export const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setSelectedRole] = useState<AppRole>('user');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ export const LoginPage: React.FC = () => {
       setError(null);
       const result = await fetchJson<UserLoginResultDto>('/api/user/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ email, password }),
       });
       if (!result.isSuccess || !result.userId) {
         setRole('guest');
@@ -31,7 +30,7 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      setRole(role);
+      setRole(result.role as AppRole);
       setCurrentUser(result.userId, result.displayName);
       navigate('/catalog');
     } catch (err: unknown) {
@@ -66,11 +65,6 @@ export const LoginPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <select value={role} onChange={(e) => setSelectedRole(e.target.value as AppRole)} required>
-                <option value="user">Пользователь</option>
-                <option value="moderator">Модератор</option>
-                <option value="admin">Администратор</option>
-              </select>
               <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
                 {loading ? 'Входим…' : 'Войти'}
               </button>
@@ -96,7 +90,6 @@ export const RegisterPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setSelectedRole] = useState<AppRole>('user');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -110,7 +103,7 @@ export const RegisterPage: React.FC = () => {
         id: 0,
         email,
         displayName: name,
-        role: role === 'guest' ? 'user' : role,
+        role: 'user',
         password,
         createdAtUtc: new Date().toISOString(),
         notifyEmailEnabled: true,
@@ -166,11 +159,6 @@ export const RegisterPage: React.FC = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <select value={role} onChange={(e) => setSelectedRole(e.target.value as AppRole)} required>
-                <option value="user">Пользователь</option>
-                <option value="moderator">Модератор</option>
-                <option value="admin">Администратор</option>
-              </select>
               <button type="submit" className={`${layout.btnPrimary} ${layout.btnBlock}`}>
                 {loading ? 'Создаём…' : 'Создать аккаунт'}
               </button>
