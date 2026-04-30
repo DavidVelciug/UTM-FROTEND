@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
@@ -77,6 +78,11 @@ const PublicFeed: React.FC = () => {
                   Открыта {new Date(c.openAtUtc).toLocaleString('ru-RU')} · Создана{' '}
                   {new Date(c.createdAtUtc).toLocaleDateString('ru-RU')}
                 </p>
+                <div className={page.row}>
+                  <Link to={`/feed-capsule/${c.id}`} className={page.badge}>
+                    Открыть
+                  </Link>
+                </div>
               </article>
             ))}
         </div>
