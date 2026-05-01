@@ -39,10 +39,18 @@
 }
 
 .mapWrap {
+  position: relative;
+  z-index: 1;
   height: 280px;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--border);
+}
+
+.mapWrap :global(.leaflet-container),
+.mapWrap :global(.leaflet-pane),
+.mapWrap :global(.leaflet-control) {
+  z-index: 1 !important;
 }
 
 .coords {
