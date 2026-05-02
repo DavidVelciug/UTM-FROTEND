@@ -1,7 +1,7 @@
 .header {
-  background: rgba(10, 10, 31, 0.8);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -19,7 +19,7 @@
 }
 
 .logo {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
@@ -66,8 +66,8 @@
 }
 
 .navBtn {
-  padding: 0.5rem 1.5rem;
-  font-size: 0.95rem;
+  padding: 0.58rem 1.1rem;
+  font-size: 0.9rem;
 }
 
 .userBlock {
@@ -95,9 +95,9 @@
   font-weight: 600;
   font-size: 0.92rem;
   padding: 0.5rem 0.7rem;
-  border: 1px solid rgba(139, 92, 246, 0.4);
+  border: 1px solid var(--border);
   border-radius: 10px;
-  background: rgba(15, 15, 45, 0.75);
+  background: var(--surface-light);
 }
 
 .menuSummary::-webkit-details-marker {
@@ -112,10 +112,10 @@
   display: grid;
   gap: 0.35rem;
   padding: 0.6rem;
-  border: 1px solid rgba(139, 92, 246, 0.28);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: rgba(8, 8, 23, 0.95);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
 }
 
 .menuItem {
@@ -128,7 +128,24 @@
 
 .menuItem:hover {
   color: var(--primary);
-  background: rgba(139, 92, 246, 0.12);
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+}
+
+.themeSwitch {
+  border: 1px solid var(--border);
+  background: var(--surface-light);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.themeSwitch:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {
