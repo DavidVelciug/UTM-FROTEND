@@ -16,6 +16,9 @@ import CapsuleView from './pages/CapsuleView';
 import FeedCapsuleView from './pages/FeedCapsuleView';
 import ErrorPage from './pages/ErrorPage';
 import ModerationCapsuleReview from './pages/ModerationCapsuleReview';
+import FAQ from './pages/FAQ';
+import Support from './pages/Support';
+import Privacy from './pages/Privacy';
 import { canAccess, canUseExtendedFeatures, getRole } from './auth/session';
 
 type GuardType = 'extended' | 'moderation' | 'stats';
@@ -81,6 +84,9 @@ function App() {
         <Route path="/error/403" element={<ErrorPage code={403} title="Доступ запрещен" message="У вас нет прав на этот раздел." />} />
         <Route path="/error/404" element={<ErrorPage code={404} title="Страница не найдена" message="Проверьте адрес страницы." />} />
         <Route path="/error/500" element={<ErrorPage code={500} title="Ошибка сервера" message="Произошла внутренняя ошибка, попробуйте позже." />} />
+        <Route path="/faq" element={<FAQ />} />
+        <Route path="/support" element={<Support />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="*" element={<Navigate to="/error/404" replace />} />
       </Routes>
     </Router>

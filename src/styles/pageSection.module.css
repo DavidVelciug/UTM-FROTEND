@@ -29,6 +29,7 @@
   border-radius: 24px;
   padding: 1.75rem;
   margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-md);
 }
 
 .card h2 {
@@ -58,7 +59,7 @@
 .textarea {
   padding: 0.85rem 1rem;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   font-size: 1rem;
@@ -92,12 +93,17 @@
 
 .badge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
+  padding: 0.36rem 0.85rem;
   border-radius: 999px;
-  font-size: 0.8rem;
-  background: rgba(139, 92, 246, 0.15);
-  border: 1px solid rgba(139, 92, 246, 0.35);
-  color: var(--text-dim);
+  font-size: 0.82rem;
+  background: color-mix(in srgb, var(--primary) 15%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  color: var(--text);
+  text-decoration: none;
+}
+
+button.badge {
+  cursor: pointer;
 }
 
 .badgeWarn {

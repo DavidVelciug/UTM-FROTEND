@@ -91,17 +91,36 @@
 .menuSummary {
   list-style: none;
   cursor: pointer;
-  color: var(--text);
+  color: var(--primary);
   font-weight: 600;
-  font-size: 0.92rem;
-  padding: 0.5rem 0.7rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-light);
+  font-size: 0.9rem;
+  padding: 0.5rem 1.1rem;
+  border: 1.5px solid color-mix(in srgb, var(--primary) 40%, transparent);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.menuSummary:hover {
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  border-color: var(--primary);
+  transform: translateY(-1px);
 }
 
 .menuSummary::-webkit-details-marker {
   display: none;
+}
+
+.arrowIcon {
+  transition: transform 0.3s ease;
+  stroke: currentColor;
+}
+
+.sectionsMenu[open] .arrowIcon {
+  transform: rotate(180deg);
 }
 
 .menuItems {
@@ -131,26 +150,31 @@
   background: color-mix(in srgb, var(--primary) 16%, transparent);
 }
 
-.themeSwitch {
+.themeSwitchCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--border);
   background: var(--surface-light);
   color: var(--text);
-  border-radius: 999px;
-  padding: 0.5rem 0.9rem;
-  font-size: 0.85rem;
+  border-radius: 50%;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, transform 0.2s;
+  transition: all 0.3s ease;
 }
 
-.themeSwitch:hover {
+.themeSwitchCircle:hover {
   color: var(--primary);
   border-color: var(--primary);
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  transform: rotate(15deg);
 }
 
 @media (max-width: 768px) {
   .headerContent {
     flex-direction: column;
+    gap: 1.5rem;
   }
 
   .navLinks {
@@ -159,6 +183,7 @@
 
   .menuItems {
     right: auto;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }

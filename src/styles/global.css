@@ -1,17 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #8b5cf6;
-  --primary-dark: #7c3aed;
-  --secondary: #ec4899;
-  --background: #030014;
-  --surface: #0a0a1f;
-  --surface-light: #12122f;
-  --text: #ffffff;
-  --text-dim: #94a3b8;
-  --text-darker: #64748b;
-  --border: #1e1b4b;
-  --gradient-primary: linear-gradient(135deg, #8b5cf6, #ec4899);
+  --primary: #6d56f8;
+  --primary-dark: #5942e8;
+  --secondary: #f04ca5;
+  --background: #f4f6ff;
+  --surface: #ffffff;
+  --surface-light: #f8f9ff;
+  --text: #12172d;
+  --text-dim: #4f5a7a;
+  --text-darker: #7b85a2;
+  --border: #d9def3;
+  --gradient-primary: linear-gradient(135deg, #6d56f8, #f04ca5);
+  --shadow-lg: 0 18px 38px rgba(24, 35, 69, 0.12);
+  --shadow-md: 0 10px 22px rgba(24, 35, 69, 0.08);
+}
+
+:root[data-theme='dark'] {
+  --primary: #9b8bff;
+  --primary-dark: #7d6dff;
+  --secondary: #f56ab4;
+  --background: #090b19;
+  --surface: #111529;
+  --surface-light: #171c33;
+  --text: #f7f8ff;
+  --text-dim: #b7bed7;
+  --text-darker: #8c95b2;
+  --border: #2b3150;
+  --gradient-primary: linear-gradient(135deg, #9b8bff, #f56ab4);
+  --shadow-lg: 0 18px 38px rgba(1, 4, 16, 0.5);
+  --shadow-md: 0 10px 22px rgba(1, 4, 16, 0.34);
 }
 
 * {
@@ -28,6 +46,15 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 @keyframes spin {
@@ -52,7 +79,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--surface);
+  background: var(--surface-light);
 }
 
 ::-webkit-scrollbar-thumb {
