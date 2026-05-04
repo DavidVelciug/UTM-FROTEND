@@ -13,35 +13,95 @@
   gap: 3rem;
 }
 
-.footerSection h3 {
-  color: var(--primary);
-  margin-bottom: 1rem;
-  font-size: 1.2rem;
+.mainIcon, .staticIcon, .linkIcon {
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
-.footerSection p {
+.brandWrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.mainIcon {
+  width: 38px;
+  height: 38px;
+}
+
+.brandTitle {
+  color: var(--primary) !important;
+  margin-bottom: 0 !important;
+  font-size: 1.4rem;
+}
+
+.description {
   color: var(--text-dim);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.8rem;
+  color: var(--text-dim);
   font-size: 0.95rem;
 }
 
-.footerSection ul {
+.contactItem a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.staticIcon {
+  width: 28px;
+  height: 28px;
+}
+
+.navList {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.footerSection li {
-  margin-bottom: 0.5rem;
+.navList li {
+  margin-bottom: 0.8rem;
 }
 
-.footerSection a {
+.animatedLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: var(--text-dim);
   text-decoration: none;
-  transition: color 0.3s;
+  transition: all 0.3s ease;
   font-size: 0.95rem;
 }
 
-.footerSection a:hover {
+.linkIcon {
+  width: 30px;
+  height: 30px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.animatedLink:hover {
   color: var(--primary);
+  transform: translateX(5px);
+}
+
+.animatedLink:hover .linkIcon {
+  transform: scale(1.15);
+  filter: brightness(1.2);
+}
+
+.footerSection h3 {
+  color: var(--primary);
+  margin-bottom: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .footerBottom {
@@ -57,6 +117,10 @@
 @media (max-width: 768px) {
   .footerContent {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
+  }
+  
+  .animatedLink:hover {
+    transform: none;
   }
 }

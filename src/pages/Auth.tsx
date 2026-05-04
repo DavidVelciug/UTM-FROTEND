@@ -69,7 +69,7 @@ export const LoginPage: React.FC = () => {
                 {loading ? 'Входим…' : 'Войти'}
               </button>
             </form>
-            {error && <p className={styles.authNote}>❌ {error}</p>}
+            {error && <p className={styles.authNote}>{error}</p>}
 
             <Link to="#" className={styles.forgotLink}>
               Забыли пароль?
@@ -163,7 +163,7 @@ export const RegisterPage: React.FC = () => {
                 {loading ? 'Создаём…' : 'Создать аккаунт'}
               </button>
             </form>
-            {error && <p className={styles.authNote}>❌ {error}</p>}
+            {error && <p className={styles.authNote}>{error}</p>}
 
             <p className={styles.authNote}>
               Уже есть аккаунт? <Link to="/login">Войти</Link>

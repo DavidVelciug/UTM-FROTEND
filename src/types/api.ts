@@ -15,6 +15,8 @@ export interface TimeCapsuleDto {
   isPublic: boolean;
   previewText?: string | null;
   isLocked?: boolean;
+  openedFrom?: string | null;
+  openedAtUtc?: string | null;
 }
 
 export interface CapsuleLocationDto {
