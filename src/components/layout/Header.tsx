@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import styles from '../../styles/header.module.css';
+import styles from './Header.module.css';
 import layout from '../../styles/layout.module.css';
 import { canAccess, canUseExtendedFeatures, getRole, logout, subscribeSessionChange } from '../../auth/session';
 import { getAvatar } from '../../auth/avatar';
@@ -67,7 +67,7 @@ const Header: React.FC = () => {
                   <Link to="/admin/moderation" className={styles.menuItem}>Модерация</Link>
                 )}
                 {canAccess(role, 'stats') && (
-                  <Link to="/admin/stats" className={styles.menuItem}>Статистика</Link>
+                  <Link to="/admin/stats" className={styles.menuItem}>Админ-панель</Link>
                 )}
                 {canAccess(role, 'stats') && (
                   <Link to="/admin/users" className={styles.menuItem}>Пользователи</Link>

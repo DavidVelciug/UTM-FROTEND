@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconRetina from 'leaflet/dist/images/marker-icon-2x.png';
@@ -9,12 +9,11 @@ import 'leaflet/dist/leaflet.css';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import layout from '../styles/layout.module.css';
-import page from '../styles/pageSection.module.css';
-import mapStyles from '../styles/memoryMap.module.css';
-import catalog from '../styles/catalog.module.css';
+import styles from '../styles/MemoryMap.module.css';
 import { fetchJson } from '../config/api';
 import type { CapsuleLocationDto, TimeCapsuleDto, UserAccountDto } from '../types/api';
 import { getCurrentUserId } from '../auth/session';
+import { getCapsuleThumbnailUrl } from '../utils/file';
 
 const MemoryMap: React.FC = () => {
   const [locations, setLocations] = useState<CapsuleLocationDto[]>([]);
@@ -78,7 +77,7 @@ const MemoryMap: React.FC = () => {
           setError(null);
         }
       } catch (e: unknown) {
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Ошибка');
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Ошибка загрузки данных');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -98,6 +97,7 @@ const MemoryMap: React.FC = () => {
       locations.filter((l) => {
         const capsule = capsuleById[l.capsuleId];
         if (!capsule) return false;
+        if (new Date(capsule.openAtUtc).getTime() > Date.now()) return false;
         return (
           capsule.isPublic ||
           capsule.ownerUserId === currentUserId ||
@@ -115,65 +115,86 @@ const MemoryMap: React.FC = () => {
     <div className={layout.pageWrapper}>
       <Header />
       <main className={layout.mainContent}>
-        <div className={page.pageHeader}>
-          <h1>Карта воспоминаний</h1>
-          <p>Привяжите капсулу к месту: «открой это, когда будешь здесь».</p>
+        <div className={styles.pageHeader}>
+          <h1 className={layout.fadeIn}>География Памяти</h1>
+          <p className={layout.fadeIn}>Исследуйте капсулы времени, оставленные в самых значимых уголках мира.</p>
         </div>
-        <div className={`${page.section} ${layout.container}`}>
+
+        <div className={`${styles.section} ${layout.container}`}>
           {loading && (
-            <div className={catalog.loadingState}>
-              <div className={catalog.loader} />
-              <p>Загружаем точки…</p>
+            <div className={styles.loadingState}>
+              <div className={styles.loader} />
+              <p className={layout.textGradient}>Синхронизация координат...</p>
             </div>
           )}
+
           {error && (
-            <div className={catalog.errorState}>
+            <div className={styles.errorState}>
               <p>{error}</p>
             </div>
           )}
+
           {!loading && !error && (
-            <>
-              <p className={page.muted}>
-                На карте отмечены капсулы с геопривязкой. Добавить точку можно через API{' '}
-                <code>/api/capsulelocation</code> после создания капсулы.
+            <div className={layout.fadeIn}>
+              <p className={styles.muted}>
+                Ваши воспоминания привязаны к реальности. Капсулы становятся доступны, когда вы находитесь рядом.
               </p>
-              <div className={mapStyles.mapWrap}>
-                <MapContainer center={center} zoom={visibleLocations.length ? 12 : 5} style={{ height: '100%', width: '100%' }}>
+              
+              <div className={styles.mapWrap}>
+                <MapContainer center={center} zoom={visibleLocations.length ? 13 : 5}>
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  {visibleLocations.map((l) => (
+                  {visibleLocations.map((l) => {
+                    const cap = capsuleById[l.capsuleId];
+                    return (
                     <Marker key={l.id} position={[l.latitude, l.longitude]}>
+                      {cap && (
+                        <Tooltip direction="top" offset={[0, -36]} opacity={1}>
+                          <div className={styles.tipInner}>
+                            <img
+                              src={getCapsuleThumbnailUrl(cap)}
+                              alt=""
+                              className={styles.tipImg}
+                            />
+                            <div className={styles.tipTitle}>{cap.title}</div>
+                          </div>
+                        </Tooltip>
+                      )}
                       <Popup>
-                        <strong>{titleById[l.capsuleId] ?? `Капсула #${l.capsuleId}`}</strong>
-                        <br />
-                        {l.placeLabel}
-                        <br />
-                        {myPosition && (
-                          <>
-                            Дистанция: {distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude).toFixed(2)} км
-                            <br />
-                            <button
-                              type="button"
-                              className={mapStyles.popupButton}
-                              onClick={() => {
-                                const dist = distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude);
-                                if (dist <= 10) {
-                                  navigate(`/feed-capsule/${l.capsuleId}`);
-                                  return;
-                                }
-                                window.alert('Открытие доступно только в радиусе 10 км.');
-                              }}
-                            >
-                              Открыть капсулу
-                            </button>
-                          </>
-                        )}
+                        <div className={styles.tipInner}>
+                          <strong style={{fontSize: '1.1rem'}}>{titleById[l.capsuleId] ?? `Капсула #${l.capsuleId}`}</strong>
+                          <div style={{margin: '8px 0', opacity: 0.8}}>{l.placeLabel}</div>
+                          {myPosition ? (
+                            <>
+                              <div style={{fontSize: '0.85rem'}}>
+                                Расстояние: <strong>{distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude).toFixed(2)} км</strong>
+                              </div>
+                              <button
+                                type="button"
+                                className={styles.popupButton}
+                                onClick={() => {
+                                  const dist = distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude);
+                                  if (dist <= 10) {
+                                    navigate(`/feed-capsule/${l.capsuleId}`);
+                                    return;
+                                  }
+                                  window.alert('Доступ запрещен. Вам нужно быть в радиусе 10 км от этой точки.');
+                                }}
+                              >
+                                Погрузиться
+                              </button>
+                            </>
+                          ) : (
+                            <div style={{fontSize: '0.8rem', color: '#ef4444'}}>Включите GPS для доступа</div>
+                          )}
+                        </div>
                       </Popup>
                     </Marker>
-                  ))}
+                    );
+                  })}
                 </MapContainer>
               </div>
-              <p className={mapStyles.mapHint}>Тайлы © OpenStreetMap contributors</p>
-            </>
+              <p className={styles.mapHint}>Картографические данные предоставлены сообществом OpenStreetMap</p>
+            </div>
           )}
         </div>
       </main>
