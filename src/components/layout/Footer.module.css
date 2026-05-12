@@ -13,7 +13,9 @@
   gap: 3rem;
 }
 
-.mainIcon, .staticIcon, .linkIcon {
+.mainIcon,
+.staticIcon,
+.linkIcon {
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -94,8 +96,8 @@
 }
 
 .animatedLink:hover .linkIcon {
-  transform: scale(1.15);
-  filter: brightness(1.2);
+  transform: scale(1.12);
+  filter: brightness(1.08);
 }
 
 .footerSection h3 {
@@ -119,7 +121,7 @@
     grid-template-columns: 1fr;
     gap: 2.5rem;
   }
-  
+
   .animatedLink:hover {
     transform: none;
   }
