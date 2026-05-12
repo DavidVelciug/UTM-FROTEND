@@ -1,0 +1,133 @@
+.pageHeader {
+  text-align: center;
+  padding: 4rem 5% 3rem;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(var(--ml-primary-rgb), 0.15),
+    transparent 70%
+  );
+}
+
+.pageHeader h1 {
+  font-size: clamp(2.2rem, 5vw, 3rem);
+  margin-bottom: 1rem;
+  background: var(--ml-gradient-aesthetic);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+}
+
+.pageHeader p {
+  color: var(--ml-text-dim);
+  font-size: 1.1rem;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.section {
+  padding: 0 5% 5rem;
+}
+
+.card {
+  background: var(--ml-card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ml-border-light);
+  border-radius: 24px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.input, .select {
+  padding: 0.75rem 1.2rem;
+  border-radius: 12px;
+  border: 1px solid var(--ml-border-light);
+  background: var(--ml-input-bg);
+  color: var(--ml-text-main);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input:focus, .select:focus {
+  border-color: var(--ml-primary-color);
+  background: var(--ml-input-bg-focus);
+}
+
+.input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.muted {
+  color: var(--ml-text-dim);
+  font-size: 0.95rem;
+  margin: 0.5rem 0;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(var(--ml-primary-rgb), 0.15);
+  color: var(--ml-primary-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.loadingState {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 6rem;
+  gap: 1.5rem;
+}
+
+.loader {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--ml-border-light);
+  border-top-color: var(--ml-primary-color);
+  border-radius: 50%;
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.errorState {
+  text-align: center;
+  padding: 3rem;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2rem;
+  font-weight: 600;
+}

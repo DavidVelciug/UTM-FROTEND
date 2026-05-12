@@ -2,8 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
-import page from '../styles/pageSection.module.css';
-import catalog from '../styles/catalog.module.css';
+import styles from '../styles/adminUsers.module.css';
 import { fetchJson } from '../config/api';
 import type { ResponceMsg, UserAccountDto } from '../types/api';
 
@@ -19,6 +18,8 @@ const AdminUsers: React.FC = () => {
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const [searchMode, setSearchMode] = useState<SearchMode>('name');
   const [query, setQuery] = useState('');
+  const [pageIndex, setPageIndex] = useState(1);
+  const pageSize = 10;
 
   const loadUsers = async () => {
     setLoading(true);
@@ -56,6 +57,8 @@ const AdminUsers: React.FC = () => {
     });
   }, [query, searchMode, sortMode, users]);
 
+  const pagedUsers = visibleUsers.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
+
   const updateRole = async (user: UserAccountDto, role: EditableRole) => {
     setMessage(null);
     try {
@@ -65,6 +68,7 @@ const AdminUsers: React.FC = () => {
       });
       setMessage(res.message);
       await loadUsers();
+      setTimeout(() => setMessage(null), 3000);
     } catch (e: unknown) {
       setMessage(e instanceof Error ? e.message : 'Ошибка изменения роли');
     }
@@ -74,61 +78,90 @@ const AdminUsers: React.FC = () => {
     <div className={layout.pageWrapper}>
       <Header />
       <main className={layout.mainContent}>
-        <div className={page.pageHeader}>
-          <h1>Админ: управление пользователями</h1>
-          <p>Смена роли пользователь/модератор, сортировка и единый поиск.</p>
+        <div className={styles.pageHeader}>
+          <h1 className={layout.fadeIn}>Управление пользователями</h1>
+          <p className={layout.fadeIn}>Администрирование ролей, поиск и фильтрация участников сообщества.</p>
         </div>
-        <div className={`${page.section} ${layout.container}`}>
-          <div className={page.card}>
-            <div className={page.row}>
+
+        <div className={`${styles.section} ${layout.container}`}>
+          <div className={`${styles.card} ${layout.fadeIn}`}>
+            <div className={styles.row}>
               <input
-                className={page.input}
+                className={styles.input}
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Поиск по имени или почте"
+                onChange={(e) => { setQuery(e.target.value); setPageIndex(1); }}
+                placeholder="Поиск по имени или почте..."
               />
-              <select className={page.select} value={searchMode} onChange={(e) => setSearchMode(e.target.value as SearchMode)}>
-                <option value="name">Искать по имени</option>
-                <option value="email">Искать по почте</option>
+              <select className={styles.select} value={searchMode} onChange={(e) => setSearchMode(e.target.value as SearchMode)}>
+                <option value="name">По имени</option>
+                <option value="email">По почте</option>
               </select>
-              <select className={page.select} value={sortMode} onChange={(e) => setSortMode(e.target.value as SortMode)}>
-                <option value="newest">Новые аккаунты</option>
-                <option value="oldest">Старые аккаунты</option>
-                <option value="name-asc">Имя (А-Я)</option>
+              <select className={styles.select} value={sortMode} onChange={(e) => setSortMode(e.target.value as SortMode)}>
+                <option value="newest">Сначала новые</option>
+                <option value="oldest">Сначала старые</option>
+                <option value="name-asc">По алфавиту</option>
               </select>
             </div>
           </div>
+
           {loading && (
-            <div className={catalog.loadingState}>
-              <div className={catalog.loader} />
-              <p>Загружаем пользователей…</p>
+            <div className={styles.loadingState}>
+              <div className={styles.loader} />
+              <p className={styles.muted}>Синхронизация данных...</p>
             </div>
           )}
-          {error && <div className={catalog.errorState}>❌ {error}</div>}
-          {message && <p className={page.muted}>{message}</p>}
-          {!loading &&
-            !error &&
-            visibleUsers.map((u) => (
-              <article key={u.id} className={page.card}>
-                <div className={page.row} style={{ justifyContent: 'space-between' }}>
-                  <strong>{u.displayName}</strong>
-                  <span className={page.badge}>{u.role}</span>
-                </div>
-                <p className={page.muted}>
-                  {u.email} · регистрация {new Date(u.createdAtUtc).toLocaleDateString('ru-RU')}
-                </p>
-                {u.role !== 'admin' && (
-                  <div className={page.row}>
-                    <button type="button" className={layout.btnPrimary} onClick={() => updateRole(u, 'user')}>
-                      Сделать пользователем
-                    </button>
-                    <button type="button" className={layout.btnPrimary} onClick={() => updateRole(u, 'moderator')}>
-                      Сделать модератором
-                    </button>
+
+          {error && <div className={styles.errorState}>{error}</div>}
+          
+          {message && <div className={styles.card} style={{borderColor: 'var(--ml-primary-color)', textAlign: 'center'}}>{message}</div>}
+
+          {!loading && !error && (
+            <div className={layout.fadeIn}>
+              {pagedUsers.map((u) => (
+                <article key={u.id} className={styles.card}>
+                  <div className={styles.row} style={{ justifyContent: 'space-between' }}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+                      <strong style={{fontSize: '1.1rem'}}>{u.displayName}</strong>
+                      <span className={styles.muted}>{u.email}</span>
+                    </div>
+                    <span className={styles.badge}>{u.role}</span>
                   </div>
-                )}
-              </article>
-            ))}
+                  
+                  <div className={styles.row} style={{ marginTop: '1.5rem', justifyContent: 'space-between', borderTop: '1px solid var(--ml-border-light)', paddingTop: '1.5rem' }}>
+                    <span className={styles.muted}>Регистрация: {new Date(u.createdAtUtc).toLocaleDateString('ru-RU')}</span>
+                    {u.role !== 'admin' && (
+                      <div className={styles.row}>
+                        <button type="button" className={layout.btnPrimary} onClick={() => updateRole(u, 'user')}>
+                          Сделать пользователем
+                        </button>
+                        <button type="button" className={layout.btnPrimary} onClick={() => updateRole(u, 'moderator')}>
+                          Назначить модератором
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </article>
+              ))}
+
+              {visibleUsers.length > pageSize && (
+                <div className={styles.pagination}>
+                  <button type="button" className={layout.btnPrimary} disabled={pageIndex <= 1} onClick={() => setPageIndex((p) => p - 1)}>
+                    Назад
+                  </button>
+                  <span className={styles.muted}>Страница {pageIndex} из {Math.ceil(visibleUsers.length / pageSize)}</span>
+                  <button type="button" className={layout.btnPrimary} disabled={pageIndex >= Math.ceil(visibleUsers.length / pageSize)} onClick={() => setPageIndex((p) => p + 1)}>
+                    Вперед
+                  </button>
+                </div>
+              )}
+
+              {visibleUsers.length === 0 && (
+                <div className={styles.errorState}>
+                  <p>Пользователи не найдены по вашему запросу</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
       <Footer />
