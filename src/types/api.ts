@@ -39,12 +39,18 @@ export interface UserAccountDto {
   loginAlertsEnabled: boolean;
 }
 
+export interface CategoryDto {
+  id: number;
+  name: string;
+}
+
 export interface ProductDto {
   id: number;
   name: string;
   price: number;
   description?: string | null;
   image?: string | null;
+  capsuleId?: number | null;
   categoryId: number;
   category?: string | null;
 }
@@ -60,12 +66,17 @@ export interface UserLoginResultDto {
   userId?: number | null;
   role: 'guest' | 'user' | 'moderator' | 'admin';
   displayName?: string | null;
+  email?: string | null;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  accessExpiresUtc?: string | null;
 }
 
 export interface ModerationReportDto {
   id: number;
   capsuleId: number;
   reporterEmail: string;
+  reporterDisplayName?: string | null;
   reason: string;
   status: number;
   createdAtUtc: string;
