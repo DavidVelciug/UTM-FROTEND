@@ -1,5 +1,7 @@
 import { apiUrl } from '../config/api';
 
+const CAPSULE_COVER_PREFIX = '__cover__:';
+
 export async function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -37,14 +39,54 @@ export function isImageSource(value?: string | null): boolean {
 }
 
 export function extractAttachmentPaths(value?: string | null): string[] {
-  if (!value) return [];
-  return value
-    .split('\n')
+  return parseCapsuleStorage(value).attachments;
+}
+
+export function parseCapsuleStorage(value?: string | null): { cover: string | null; attachments: string[] } {
+  if (!value) return { cover: null, attachments: [] };
+  const parts = value
+    .split(/\r?\n/)
     .map((part) => part.trim())
     .filter(Boolean);
+
+  let cover: string | null = null;
+  const attachments: string[] = [];
+
+  for (const part of parts) {
+    if (part.startsWith(CAPSULE_COVER_PREFIX)) {
+      const nextCover = part.slice(CAPSULE_COVER_PREFIX.length).trim();
+      if (nextCover) cover = nextCover;
+      continue;
+    }
+    attachments.push(part);
+  }
+
+  return { cover, attachments };
 }
 
 export function resolveUserAvatar(ownerUserId: number, ownerDisplayName?: string | null): string {
   const seed = `${ownerUserId}-${ownerDisplayName ?? 'user'}`;
   return `https://api.dicebear.com/9.x/initials/svg?seed=${encodeURIComponent(seed)}`;
+}
+
+export function getCapsuleThumbnailUrl(c: {
+  contentType: number;
+  fileStoragePath?: string | null;
+  linkUrl?: string | null;
+}): string {
+  const parsed = parseCapsuleStorage(c.fileStoragePath);
+  if (parsed.cover && isImageSource(parsed.cover)) {
+    return resolveMediaUrl(parsed.cover, '/assets/default-capsule-cover.svg');
+  }
+  const firstAttachment = parsed.attachments[0];
+  if (firstAttachment && isImageSource(firstAttachment)) {
+    return resolveMediaUrl(firstAttachment, '/assets/default-capsule-cover.svg');
+  }
+  if (isImageSource(c.fileStoragePath)) {
+    return resolveMediaUrl(c.fileStoragePath, '/assets/default-capsule-cover.svg');
+  }
+  if (c.contentType === 1 && c.linkUrl) {
+    return '/assets/default-capsule-cover.svg';
+  }
+  return '/assets/default-capsule-cover.svg';
 }
