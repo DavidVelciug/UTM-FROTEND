@@ -1,5 +1,6 @@
 export interface Product {
   id: number;
+  capsuleId?: number | null;
   name: string;
   price: number;
   category: string;
