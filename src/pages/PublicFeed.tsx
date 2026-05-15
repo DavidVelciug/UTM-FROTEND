@@ -3,20 +3,22 @@ import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import layout from '../styles/layout.module.css';
-import page from '../styles/pageSection.module.css';
-import catalog from '../styles/catalog.module.css';
+import feed from '../styles/PublicFeed.module.css';
+import spinner from '../styles/loading.module.css';
 import { fetchJson } from '../config/api';
 import type { ModerationReportDto, ResponceMsg, TimeCapsuleDto } from '../types/api';
 import { getFeedCounts, getFeedUserReaction, toggleFeedReaction } from '../auth/reactions';
 import { isImageSource, resolveMediaUrl, resolveUserAvatar } from '../utils/file';
 import { getAvatarByUserId } from '../auth/avatar';
+import CapsuleContentPreview from '../components/CapsuleContentPreview';
+import { getCurrentUserEmail } from '../auth/session';
 
 const PublicFeed: React.FC = () => {
   const [items, setItems] = useState<TimeCapsuleDto[]>([]);
   const [likes, setLikes] = useState<Record<number, number>>({});
   const [dislikes, setDislikes] = useState<Record<number, number>>({});
   const [userReactions, setUserReactions] = useState<Record<number, 'like' | 'dislike' | null>>({});
-  const [loading, setLoading] = useState(true);
+  const [loadingFeed, setLoadingFeed] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [reportTarget, setReportTarget] = useState<TimeCapsuleDto | null>(null);
@@ -43,7 +45,7 @@ const PublicFeed: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        setLoading(true);
+        setLoadingFeed(true);
         const data = await fetchJson<TimeCapsuleDto[]>('/api/timecapsule/getPublicFeed');
         if (!cancelled) {
           setItems(data);
@@ -53,10 +55,12 @@ const PublicFeed: React.FC = () => {
       } catch (e: unknown) {
         if (!cancelled) setError(e instanceof Error ? e.message : 'Ошибка');
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) setLoadingFeed(false);
       }
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const react = (capsuleId: number, reaction: 'like' | 'dislike') => {
@@ -68,7 +72,7 @@ const PublicFeed: React.FC = () => {
     const payload: ModerationReportDto = {
       id: 0,
       capsuleId: capsule.id,
-      reporterEmail: 'user@memorylane.local',
+      reporterEmail: getCurrentUserEmail() || 'guest@memorylane.local',
       reason: reportText.trim() || 'Жалоба на контент',
       status: 0,
       createdAtUtc: new Date().toISOString(),
@@ -92,112 +96,140 @@ const PublicFeed: React.FC = () => {
   return (
     <div className={layout.pageWrapper}>
       <Header />
-      <main className={`${layout.mainContent} ${layout.fadeIn}`}>
-        <div className={page.pageHeader}>
+      <main className={`${layout.mainContent} ${layout.fadeIn} ${feed.feedBackdrop}`}>
+        <div className={feed.pageHeader}>
           <h1 className={layout.textGradient}>Публичные воспоминания</h1>
           <p>Общая лента открытых капсул — делитесь моментами прошлого.</p>
         </div>
 
-        <div className={page.feedContainer}>
-          {loading && (
-            <div className={catalog.loadingState}>
-              <div className={catalog.loader} />
+        <div className={feed.feedContainer}>
+          {loadingFeed && (
+            <div className={spinner.loadingState}>
+              <div className={spinner.loader} />
             </div>
           )}
-          
-          {error && <div className={catalog.errorState}>{error}</div>}
-          
-          {info && <div className={page.statusMsg}>{info}</div>}
 
-          <div className={page.chatTimeline}>
-            {!loading && !error && paged.map((c) => (
-              <div key={c.id} className={page.messageRow}>
-                <div className={page.avatarSpace}>
-                  <img
-                    src={getAvatarByUserId(c.ownerUserId) || resolveUserAvatar(c.ownerUserId, c.ownerDisplayName)}
-                    alt="avatar"
-                    className={page.chatAvatar}
-                    onError={(e) => { e.currentTarget.src = '/assets/default-avatar.svg'; }}
-                  />
-                </div>
-                
-                <div className={page.messageBubble}>
-                  <div className={page.messageInfo}>
-                    <span className={page.authorName}>{c.ownerDisplayName || 'Аноним'}</span>
-                    <span className={page.userTag}>Участник</span>
-                    <span className={page.messageTime}>
-                      {new Date(c.createdAtUtc).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    <button className={page.reportTrigger} onClick={() => setReportTarget(c)}>
-                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
-                    </button>
+          {error && <div className={spinner.errorState}>{error}</div>}
+
+          {info && <div className={feed.statusMsg}>{info}</div>}
+
+          <div className={feed.chatTimeline}>
+            {!loadingFeed &&
+              !error &&
+              paged.map((c) => (
+                <div key={c.id} className={feed.messageRow}>
+                  <div className={feed.avatarSpace}>
+                    <img
+                      src={getAvatarByUserId(c.ownerUserId) || resolveUserAvatar(c.ownerUserId, c.ownerDisplayName)}
+                      alt="avatar"
+                      className={feed.chatAvatar}
+                      onError={(e) => {
+                        e.currentTarget.src = '/assets/default-avatar.svg';
+                      }}
+                    />
                   </div>
 
-                  <div className={page.messageContent}>
-                    <h2 className={page.capsuleTitle}>{c.title}</h2>
-                    <p className={page.capsuleText}>{c.previewText || 'Внутри этой капсулы находится ценное воспоминание.'}</p>
-                    
-                    {isImageSource(c.fileStoragePath) && (
-                      <div className={page.messageAttachment}>
-                        <img
-                          src={resolveMediaUrl(c.fileStoragePath, '/assets/default-capsule-cover.svg')}
-                          alt="content"
-                          className={page.attachImg}
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className={page.messageFooter}>
-                    <div className={page.reactionsInline}>
-                      <button 
-                        className={`${page.reactIconBtn} ${userReactions[c.id] === 'like' ? page.activeLike : ''}`}
-                        onClick={() => react(c.id, 'like')}
-                      >
-                        <span className={page.emoji}>👍</span>
-                        <span className={page.count}>{likes[c.id] ?? 0}</span>
-                      </button>
-                      <button 
-                        className={`${page.reactIconBtn} ${userReactions[c.id] === 'dislike' ? page.activeDislike : ''}`}
-                        onClick={() => react(c.id, 'dislike')}
-                      >
-                        <span className={page.emoji}>👎</span>
-                        <span className={page.count}>{dislikes[c.id] ?? 0}</span>
+                  <div className={feed.messageBubble}>
+                    <div className={feed.messageInfo}>
+                      <span className={feed.authorName}>{c.ownerDisplayName || 'Аноним'}</span>
+                      <span className={feed.userTag}>Участник</span>
+                      <span className={feed.messageTime}>
+                        {new Date(c.createdAtUtc).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <button type="button" className={feed.reportTrigger} onClick={() => setReportTarget(c)}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+                          <line x1="4" y1="22" x2="4" y2="15" />
+                        </svg>
                       </button>
                     </div>
-                    <Link to={`/feed-capsule/${c.id}`} className={page.unpackBtn}>Распаковать</Link>
+
+                    <div className={feed.messageContent}>
+                      <h2 className={feed.capsuleTitle}>{c.title}</h2>
+                      <p className={feed.capsuleText}>
+                        {c.previewText || 'Внутри этой капсулы находится ценное воспоминание.'}
+                      </p>
+
+                      {(c.contentType === 1 || c.contentType === 2) && <CapsuleContentPreview capsule={c} />}
+
+                      {c.contentType === 0 && isImageSource(c.fileStoragePath) && (
+                        <div className={feed.messageAttachment}>
+                          <img
+                            src={resolveMediaUrl(c.fileStoragePath, '/assets/default-capsule-cover.svg')}
+                            alt="content"
+                            className={feed.attachImg}
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className={feed.messageFooter}>
+                      <div className={feed.reactionsInline}>
+                        <button
+                          type="button"
+                          className={`${feed.reactIconBtn} ${userReactions[c.id] === 'like' ? feed.activeLike : ''}`}
+                          onClick={() => react(c.id, 'like')}
+                        >
+                          <span className={feed.emoji}>👍</span>
+                          <span className={feed.count}>{likes[c.id] ?? 0}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className={`${feed.reactIconBtn} ${userReactions[c.id] === 'dislike' ? feed.activeDislike : ''}`}
+                          onClick={() => react(c.id, 'dislike')}
+                        >
+                          <span className={feed.emoji}>👎</span>
+                          <span className={feed.count}>{dislikes[c.id] ?? 0}</span>
+                        </button>
+                      </div>
+                      <Link to={`/feed-capsule/${c.id}`} className={feed.unpackBtn}>
+                        Распаковать
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
 
-          {!loading && sorted.length > pageSize && (
-            <div className={page.paginationMini}>
-              <button disabled={pageIndex <= 1} onClick={() => setPageIndex(p => p - 1)}>←</button>
-              <span>{pageIndex} / {Math.ceil(sorted.length / pageSize)}</span>
-              <button disabled={pageIndex >= Math.ceil(sorted.length / pageSize)} onClick={() => setPageIndex(p => p + 1)}>→</button>
+          {!loadingFeed && sorted.length > pageSize && (
+            <div className={feed.paginationMini}>
+              <button type="button" disabled={pageIndex <= 1} onClick={() => setPageIndex((p) => p - 1)}>
+                ←
+              </button>
+              <span>
+                {pageIndex} / {Math.ceil(sorted.length / pageSize)}
+              </span>
+              <button
+                type="button"
+                disabled={pageIndex >= Math.ceil(sorted.length / pageSize)}
+                onClick={() => setPageIndex((p) => p + 1)}
+              >
+                →
+              </button>
             </div>
           )}
         </div>
       </main>
 
-      {/* МОДАЛКА ВЫНЕСЕНА ИЗ MAIN ЧТОБЫ FIXED РАБОТАЛ НА ВЕСЬ ЭКРАН */}
       {reportTarget && (
-        <div className={page.modalOverlay}>
-          <div className={page.modalBody}>
-            <h3 className={page.modalTitle}>Пожаловаться</h3>
-            <p className={page.muted}>Опишите причину нарушения в капсуле «{reportTarget.title}»</p>
-            <textarea 
-              className={page.modalInput} 
-              value={reportText} 
+        <div className={feed.modalOverlay}>
+          <div className={feed.modalBody}>
+            <h3 className={feed.modalTitle}>Пожаловаться</h3>
+            <p className={feed.muted}>Опишите причину нарушения в капсуле «{reportTarget.title}»</p>
+            <textarea
+              className={feed.modalInput}
+              value={reportText}
               onChange={(e) => setReportText(e.target.value)}
               placeholder="Текст жалобы..."
             />
-            <div className={page.modalButtons}>
-              <button className={page.cancelBtn} onClick={() => setReportTarget(null)}>Отмена</button>
-              <button className={page.confirmBtn} onClick={() => void reportCapsule(reportTarget)}>Отправить</button>
+            <div className={feed.modalButtons}>
+              <button type="button" className={feed.cancelBtn} onClick={() => setReportTarget(null)}>
+                Отмена
+              </button>
+              <button type="button" className={feed.confirmBtn} onClick={() => void reportCapsule(reportTarget)}>
+                Отправить
+              </button>
             </div>
           </div>
         </div>

@@ -1,5 +1,4 @@
-/** Базовый URL API. Пустая строка + proxy Vite → тот же хост. */
-import { getRole } from '../auth/session';
+import { getAccessToken, getRole } from '../auth/session';
 
 export const API_BASE = import.meta.env.VITE_API_URL ?? '';
 
@@ -9,11 +8,12 @@ export function apiUrl(path: string): string {
 }
 
 export async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const token = getAccessToken();
   const res = await fetch(apiUrl(path), {
     ...init,
     headers: {
       'Content-Type': 'application/json',
-      'X-User-Role': getRole(),
+      ...(token ? { Authorization: `Bearer ${token}` } : { 'X-User-Role': getRole() }),
       ...(init?.headers ?? {}),
     },
   });
