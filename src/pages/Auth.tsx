@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
-import styles from '../styles/auth.module.css';
-import { setCurrentUser, setRole, type AppRole } from '../auth/session';
+import styles from '../styles/Auth.module.css';
+import { persistAuthFromLogin, setRole, type AppRole } from '../auth/session';
 import { fetchJson } from '../config/api';
 import type { UserAccountDto, UserLoginResultDto } from '../types/api';
 
@@ -30,8 +30,7 @@ export const LoginPage: React.FC = () => {
         return;
       }
 
-      setRole(result.role as AppRole);
-      setCurrentUser(result.userId, result.displayName);
+      persistAuthFromLogin(result);
       navigate('/catalog');
     } catch (err: unknown) {
       setRole('guest');
