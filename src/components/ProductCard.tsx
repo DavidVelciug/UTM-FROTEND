@@ -1,27 +1,31 @@
 import React, { useState } from 'react';
-import styles from '../styles/productCard.module.css';
+import styles from '../styles/ProductCard.module.css';
 import { resolveMediaUrl } from '../utils/file';
 
 interface ProductCardProps {
   id: number;
+  capsuleId?: number | null;
   name: string;
   price: number;
   image: string;
   description: string;
+  openAtUtc?: string;
   likesCount: number;
   dislikesCount: number;
   userReaction: 'like' | 'dislike' | null;
   onLike: (id: number) => void;
   onDislike: (id: number) => void;
-  onOpen: (id: number) => void;
+  onOpen: (capsuleId: number | null | undefined) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({
   id,
+  capsuleId,
   name,
   price,
   image,
   description,
+  openAtUtc,
   likesCount,
   dislikesCount,
   userReaction,
@@ -44,6 +48,11 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className={styles.productInfo}>
         <h3 className={styles.productName}>{name}</h3>
         <p className={styles.productDescription}>{description}</p>
+        {openAtUtc && (
+          <p className={styles.productDescription}>
+            Дата открытия: {new Date(openAtUtc).toLocaleString('ru-RU')}
+          </p>
+        )}
         <p className={styles.productPrice}>{price} MDL</p>
         <button
           type="button"
@@ -64,7 +73,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           className={styles.likeBtn}
           onClick={() => {
             setOpened(true);
-            onOpen(id);
+            onOpen(capsuleId);
           }}
         >
           Распаковать капсулу

@@ -1,7 +1,7 @@
 import React from 'react';
 import ProductCard from './ProductCard';
 import { Product } from '../data/products';
-import styles from '../styles/productCard.module.css';
+import styles from '../styles/ProductCard.module.css';
 
 interface ProductListProps {
   products: Product[];
@@ -10,7 +10,7 @@ interface ProductListProps {
   userReactions: Record<number, 'like' | 'dislike' | null>;
   onLike: (id: number) => void;
   onDislike: (id: number) => void;
-  onOpen: (id: number) => void;
+  onOpen: (capsuleId: number | null | undefined) => void;
 }
 
 const ProductList: React.FC<ProductListProps> = ({
@@ -28,6 +28,7 @@ const ProductList: React.FC<ProductListProps> = ({
         <ProductCard
           key={product.id}
           id={product.id}
+          capsuleId={product.capsuleId}
           name={product.name}
           price={product.price}
           image={product.image}

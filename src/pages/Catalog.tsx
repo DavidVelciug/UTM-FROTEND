@@ -7,9 +7,10 @@ import FilterButtons from '../components/filters/FilterButtons';
 import ProductList from '../components/catalog/ProductList';
 import { Product } from '../data/products';
 import layout from '../styles/layout.module.css';
-import styles from '../styles/catalog.module.css';
+import styles from '../styles/Catalog.module.css';
+import spinner from '../styles/loading.module.css';
 import { fetchJson } from '../config/api';
-import type { ProductDto } from '../types/api';
+import type { CategoryDto, ProductDto } from '../types/api';
 import { getCatalogCounts, getCatalogUserReaction, toggleCatalogReaction } from '../auth/reactions';
 
 const Catalog: React.FC = () => {
@@ -19,13 +20,14 @@ const Catalog: React.FC = () => {
   const [tab, setTab] = useState<'all' | 'new'>('all');
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
+  const [categoryNames, setCategoryNames] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [likesMap, setLikesMap] = useState<Record<number, number>>({});
   const [dislikesMap, setDislikesMap] = useState<Record<number, number>>({});
   const [userReactions, setUserReactions] = useState<Record<number, 'like' | 'dislike' | null>>({});
   const navigate = useNavigate();
-  const pageSize = 15;
+  const pageSize = 8;
 
   const refreshReactions = (items: Product[]) => {
     const likes: Record<number, number> = {};
@@ -44,16 +46,21 @@ const Catalog: React.FC = () => {
     setUserReactions(user);
   };
 
-  useEffect(() => {
-    const loadProducts = async () => {
+  const loadProducts = async () => {
       try {
         setLoading(true);
-        const data = await fetchJson<ProductDto[]>('/api/product/getAll');
+        const [data, cats] = await Promise.all([
+          fetchJson<ProductDto[]>('/api/product/getAll'),
+          fetchJson<CategoryDto[]>('/api/category/getAll'),
+        ]);
+        const catMap = new Map<number, string>(cats.map((c) => [c.id, c.name]));
+        setCategoryNames(cats.map((c) => c.name));
         const mapped: Product[] = data.map((p) => ({
           id: p.id,
+          capsuleId: p.capsuleId ?? null,
           name: p.name,
           price: Number(p.price),
-          category: p.category || 'Без категории',
+          category: p.category || (catMap.get(p.categoryId) ?? 'Без категории'),
           image: p.image || '/assets/default-capsule-cover.svg',
           description: p.description || 'Без описания',
           creatorName: 'Пользователь',
@@ -69,10 +76,17 @@ const Catalog: React.FC = () => {
       }
     };
 
+  useEffect(() => {
     void loadProducts();
   }, []);
 
-  const categories = useMemo(() => ['Все', ...new Set(products.map((p) => p.category))], [products]);
+  useEffect(() => {
+    const onFocus = () => void loadProducts();
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, []);
+
+  const categories = useMemo(() => ['Все', ...new Set(categoryNames.length ? categoryNames : products.map((p) => p.category))], [categoryNames, products]);
 
   const filteredProducts = useMemo(
     () =>
@@ -103,8 +117,12 @@ const Catalog: React.FC = () => {
     refreshReactions(products);
   };
 
-  const handleOpen = (id: number) => {
-    navigate(`/capsule-view/${id}`);
+  const handleOpen = (capsuleId: number | null | undefined) => {
+    if (!capsuleId) {
+      setError('У этой позиции каталога нет связанной капсулы. Пересоздайте капсулу в режиме каталога.');
+      return;
+    }
+    navigate(`/capsule-view/${capsuleId}`);
   };
 
   return (
@@ -144,14 +162,14 @@ const Catalog: React.FC = () => {
           </div>
 
           {loading && (
-            <div className={styles.loadingState}>
-              <div className={styles.loader} />
+            <div className={spinner.loadingState}>
+              <div className={spinner.loader} />
               <p>Загружаем капсулы времени...</p>
             </div>
           )}
 
           {error && (
-            <div className={styles.errorState}>
+            <div className={spinner.errorState}>
               <p>Ошибка: {error}</p>
               <button type="button" onClick={() => window.location.reload()} className={layout.btnPrimary}>
                 Попробовать снова
@@ -193,9 +211,9 @@ const Catalog: React.FC = () => {
           )}
 
           {!loading && !error && filteredProducts.length === 0 && (
-            <div className={styles.emptyState}>
+            <div className={spinner.emptyState}>
               <p>Ничего не найдено</p>
-              <p className={styles.emptyHint}>Попробуйте изменить параметры поиска</p>
+              <p className={spinner.emptyHint}>Попробуйте изменить параметры поиска</p>
             </div>
           )}
         </div>
