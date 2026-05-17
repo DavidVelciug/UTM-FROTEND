@@ -3,7 +3,8 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import layout from '../styles/layout.module.css';
 import page from '../styles/pageSection.module.css';
-import catalog from '../styles/catalog.module.css';
+import spinner from '../styles/loading.module.css';
+import profile from '../styles/ProfileSettings.module.css';
 import { fetchJson } from '../config/api';
 import { getCurrentUserId } from '../auth/session';
 import { getAvatar, setAvatar } from '../auth/avatar';
@@ -63,28 +64,34 @@ const ProfileSettings: React.FC = () => {
       <Header />
       <main className={`${layout.mainContent} ${layout.fadeIn}`}>
         <div className={page.pageHeader}>
-          <h1>Настройки профиля</h1>
-          <p>Основные данные вашего аккаунта и визуальное оформление.</p>
+          <h1 className={layout.textGradient}>Настройки профиля</h1>
+          <p>Ваше личное пространство в Memory Lane.</p>
         </div>
         <div className={`${page.section} ${layout.container}`}>
           {loading && (
-            <div className={catalog.loadingState}>
-              <div className={catalog.loader} />
+            <div className={spinner.loadingState}>
+              <div className={spinner.loader} />
             </div>
           )}
-          {error && <div className={catalog.errorState}>{error}</div>}
+          {error && <div className={spinner.errorState}>{error}</div>}
+          
           {user && (
-            <form className={page.settingsFormContainer} onSubmit={save}>
-              <div className={page.card}>
-                <div className={page.profileAesthetics}>
-                  <div className={page.avatarUploadWrapper}>
+            <form className={profile.settingsFormContainer} onSubmit={save}>
+              <div className={profile.card}>
+                <div className={profile.profileAesthetics}>
+                  <div className={profile.avatarUploadWrapper}>
                     <img
                       src={resolveMediaUrl(avatar, '/assets/default-avatar.svg')}
                       alt="Аватар"
-                      className={page.avatarCircle}
+                      className={profile.avatarCircle}
                       onError={(e) => { e.currentTarget.src = '/assets/default-avatar.svg'; }}
                     />
-                    <label className={page.avatarEditOverlay}>
+                    <label className={profile.avatarEditOverlay}>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                        <circle cx="12" cy="13" r="4"></circle>
+                      </svg>
+                      <span>Обновить</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -96,37 +103,38 @@ const ProfileSettings: React.FC = () => {
                           });
                         }}
                       />
-                      <span>Изменить</span>
                     </label>
                   </div>
-                  <div className={page.profileQuickInfo}>
+                  <div className={profile.profileQuickInfo}>
                     <h3>{user.displayName || 'Пользователь'}</h3>
-                    <p className={page.hint}>{user.email}</p>
+                    <p className={profile.hint}>{user.email}</p>
                   </div>
                 </div>
 
-                <div className={page.formGrid}>
-                  <label className={page.label}>
+                <div className={profile.formGrid}>
+                  <label className={profile.label}>
                     Электронная почта
                     <input
-                      className={page.input}
+                      className={profile.input}
                       value={user.email}
                       onChange={(e) => setUser({ ...user, email: e.target.value })}
                       required
+                      type="email"
                     />
                   </label>
-                  <label className={page.label}>
+                  <label className={profile.label}>
                     Отображаемое имя
                     <input
-                      className={page.input}
+                      className={profile.input}
                       value={user.displayName}
                       onChange={(e) => setUser({ ...user, displayName: e.target.value })}
+                      placeholder="Как вас называть?"
                     />
                   </label>
                   <button type="submit" className={`${layout.btnPrimaryLarge} ${layout.btnBlock}`}>
-                    Сохранить настройки
+                    Сохранить изменения
                   </button>
-                  {msg && <p className={page.statusMsg}>{msg}</p>}
+                  {msg && <p className={profile.statusMsg}>{msg}</p>}
                 </div>
               </div>
             </form>

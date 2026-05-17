@@ -4,9 +4,9 @@
 
 .searchInput {
   width: 100%;
-  padding: 1.2rem 2rem;
-  border-radius: 50px;
-  background: var(--surface-light);
+  padding: 0.95rem 1.2rem;
+  border-radius: 14px;
+  background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
   font-size: 1rem;

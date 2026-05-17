@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../styles/filterButtons.module.css';
+import styles from '../styles/FilterButtons.module.css';
 
 interface FilterButtonsProps {
   categories: string[];

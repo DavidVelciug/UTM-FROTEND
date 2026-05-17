@@ -1,0 +1,188 @@
+.settingsFormContainer {
+  max-width: 700px;
+  margin: 2rem auto;
+  perspective: 1000px;
+}
+
+.card {
+  background: color-mix(in srgb, var(--surface-light) 94%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 3rem;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.profileAesthetics {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.avatarUploadWrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  padding: 5px;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary) 55%, transparent),
+    color-mix(in srgb, var(--secondary) 55%, transparent)
+  );
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease;
+}
+
+.avatarUploadWrapper:hover {
+  transform: scale(1.05) rotate(3deg);
+}
+
+.avatarCircle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--surface);
+}
+
+.avatarEditOverlay {
+  position: absolute;
+  inset: 5px;
+  background: color-mix(in srgb, var(--text) 72%, transparent);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--background);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  backdrop-filter: blur(2px);
+}
+
+.avatarUploadWrapper:hover .avatarEditOverlay {
+  opacity: 1;
+}
+
+.avatarEditOverlay svg {
+  margin-bottom: 0.5rem;
+  width: 20px;
+  height: 20px;
+}
+
+.avatarEditOverlay input {
+  display: none;
+}
+
+.profileQuickInfo h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--text), var(--text-dim));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.profileQuickInfo .hint {
+  color: var(--text-dim);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.input {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1rem 1.2rem;
+  border-radius: 14px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 2px 4px color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.input:hover {
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--surface-light);
+  box-shadow:
+    0 0 15px color-mix(in srgb, var(--primary) 18%, transparent),
+    inset 0 2px 4px color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.statusMsg {
+  text-align: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, #10b981 12%, transparent);
+  color: #059669;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: 1px solid color-mix(in srgb, #10b981 28%, transparent);
+  animation: fadeIn 0.5s ease;
+}
+
+:root[data-theme='dark'] .statusMsg {
+  color: #34d399;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .profileAesthetics {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .card {
+    padding: 2rem;
+  }
+}

@@ -10,14 +10,14 @@
   border-radius: 24px;
   overflow: hidden;
   border: 1px solid var(--border);
-  transition: all 0.4s;
+  transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
   cursor: pointer;
   position: relative;
 }
 
 .productCard:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(139, 92, 246, 0.3);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
   border-color: var(--primary);
 }
 
@@ -63,8 +63,8 @@
 
 .likeBtn {
   width: 100%;
-  padding: 0.8rem;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 0.7rem;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 16px;
   color: var(--text-dim);
@@ -79,13 +79,13 @@
 }
 
 .likeBtn:hover {
-  background: rgba(139, 92, 246, 0.1);
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
   border-color: var(--primary);
-  color: white;
+  color: var(--text);
 }
 
 .likeBtnLiked {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+  background: color-mix(in srgb, var(--secondary) 24%, var(--surface));
   border-color: var(--secondary);
-  color: white;
+  color: var(--text);
 }

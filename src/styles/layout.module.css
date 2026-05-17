@@ -100,3 +100,58 @@
     padding: 0 3%;
   }
 }
+
+/* --- layout.module.css --- */
+
+/* Определение переменных для тем.
+   JS должен добавлять класс light-theme или dark-theme к телу (<body>) или корню (<html>).
+*/
+
+/* Темная тема (по умолчанию, если класс не задан) */
+:root,
+:global(body.dark-theme) {
+  --ml-page-bg: #050609; /* Глубокий темный */
+  --ml-card-bg: rgba(20, 22, 30, 0.6); /* Glassmorphism темный */
+  --ml-input-bg: rgba(0, 0, 0, 0.3);
+  --ml-input-bg-focus: rgba(0, 0, 0, 0.5);
+  --ml-border-light: rgba(255, 255, 255, 0.08);
+  --ml-surface: #14161e;
+  --ml-text-main: #ffffff;
+  --ml-text-dim: #9ca3af;
+  --ml-primary-color: #6366f1; /* Индиго */
+  
+  /* Для градиентов и эффектов */
+  --ml-primary-rgb: 99, 102, 241;
+  --ml-accent-rgb: 236, 72, 153; /* Розовый MemoryLane */
+  --ml-gradient-aesthetic: linear-gradient(135deg, #a855f7, #ec4899, #6366f1);
+}
+
+/* Светлая тема */
+:global(body.light-theme) {
+  --ml-page-bg: #f9fafb; /* Очень светлый серый */
+  --ml-card-bg: rgba(255, 255, 255, 0.8); /* Glassmorphism светлый */
+  --ml-input-bg: #ffffff;
+  --ml-input-bg-focus: #f3f4f6;
+  --ml-border-light: rgba(0, 0, 0, 0.08);
+  --ml-surface: #ffffff;
+  --ml-text-main: #111827;
+  --ml-text-dim: #6b7280;
+  --ml-primary-color: #a855f7; /* Фиолетовый MemoryLane для светлой */
+
+  /* Для градиентов и эффектов */
+  --ml-primary-rgb: 168, 85, 247;
+  --ml-accent-rgb: 236, 72, 153; /* Розовый MemoryLane сохраняем */
+  --ml-gradient-aesthetic: linear-gradient(135deg, #6366f1, #ec4899, #a855f7);
+}
+
+/* Применение глобальных стилей к wrapper страницы */
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--ml-page-bg);
+  color: var(--ml-text-main);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Сохраняем остальные ваши стили layout.module.css ниже... */

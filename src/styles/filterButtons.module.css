@@ -7,10 +7,10 @@
 }
 
 .filterBtn {
-  padding: 0.8rem 2rem;
-  border-radius: 50px;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
   border: 1px solid var(--border);
-  background: var(--surface-light);
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
   font-weight: 500;
@@ -24,7 +24,8 @@
 
 .filterBtnActive {
   background: var(--gradient-primary);
-  border: none;
+  border-color: transparent;
+  color: #fff;
 }
 
 @media (max-width: 480px) {

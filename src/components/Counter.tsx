@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../styles/counter.module.css';
+import styles from '../styles/Counter.module.css';
 
 interface CounterProps {
   count: number;
