@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+
 import layout from '../styles/layout.module.css';
 import page from '../styles/pageSection.module.css';
 
@@ -11,9 +12,9 @@ type Props = {
 };
 
 const ErrorPage: React.FC<Props> = ({ code, title, message }) => (
-  <div className={layout.pageWrapper}>
+  <div className={`${layout.pageWrapper} ${layout.withBg}`}>
     <Header />
-    <main className={layout.mainContent}>
+      <main className={layout.mainContent}>
       <section className={`${page.section} ${layout.container}`}>
         <article className={page.card}>
           <h1>{code} — {title}</h1>

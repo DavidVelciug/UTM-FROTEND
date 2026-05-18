@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import SearchBar from '../components/filters/SearchBar';
-import FilterButtons from '../components/filters/FilterButtons';
 import ProductList from '../components/catalog/ProductList';
 import { Product } from '../data/products';
 import layout from '../styles/layout.module.css';
@@ -13,14 +12,15 @@ import { fetchJson } from '../config/api';
 import type { CategoryDto, ProductDto } from '../types/api';
 import { getCatalogCounts, getCatalogUserReaction, toggleCatalogReaction } from '../auth/reactions';
 
+const TABS = ['Все', 'Личное', 'Мечты', 'Публичное', 'Прошлое'];
+
 const Catalog: React.FC = () => {
   const [search, setSearch] = useState<string>('');
   const [filter, setFilter] = useState<string>('Все');
   const [sortByPrice, setSortByPrice] = useState<'asc' | 'desc'>('asc');
-  const [tab, setTab] = useState<'all' | 'new'>('all');
+  const [sortByNewest, setSortByNewest] = useState<'all' | 'newest'>('all');
   const [page, setPage] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
-  const [categoryNames, setCategoryNames] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [likesMap, setLikesMap] = useState<Record<number, number>>({});
@@ -54,7 +54,6 @@ const Catalog: React.FC = () => {
           fetchJson<CategoryDto[]>('/api/category/getAll'),
         ]);
         const catMap = new Map<number, string>(cats.map((c) => [c.id, c.name]));
-        setCategoryNames(cats.map((c) => c.name));
         const mapped: Product[] = data.map((p) => ({
           id: p.id,
           capsuleId: p.capsuleId ?? null,
@@ -86,19 +85,19 @@ const Catalog: React.FC = () => {
     return () => window.removeEventListener('focus', onFocus);
   }, []);
 
-  const categories = useMemo(() => ['Все', ...new Set(categoryNames.length ? categoryNames : products.map((p) => p.category))], [categoryNames, products]);
-
   const filteredProducts = useMemo(
     () =>
       products
         .filter((product) => {
           const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
           const matchesFilter = filter === 'Все' || product.category === filter;
-          const matchesTab = tab === 'all' || product.id > Math.max(0, products.length - pageSize);
-          return matchesSearch && matchesFilter && matchesTab;
+          return matchesSearch && matchesFilter;
         })
-        .sort((a, b) => (sortByPrice === 'asc' ? a.price - b.price : b.price - a.price)),
-    [filter, pageSize, products, search, sortByPrice, tab],
+        .sort((a, b) => {
+          if (sortByNewest === 'newest') return b.id - a.id;
+          return sortByPrice === 'asc' ? a.price - b.price : b.price - a.price;
+        }),
+    [filter, products, search, sortByNewest, sortByPrice],
   );
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / pageSize));
@@ -126,98 +125,122 @@ const Catalog: React.FC = () => {
   };
 
   return (
-    <div className={styles.catalogPage}>
+    <div className={`${layout.pageWrapper} ${styles.catalogPage} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
-        <div className={styles.catalogHeaderSection}>
-          <h1>Архив воспоминаний</h1>
-          <p>Исследуйте капсулы времени, созданные другими людьми</p>
-        </div>
-
-        <div className={layout.container}>
-          <div className={styles.catalogControls}>
-            <SearchBar value={search} onChange={setSearch} />
-            <FilterButtons categories={categories} activeFilter={filter} onFilterChange={setFilter} />
-            <div className={styles.catalogControls}>
-              <select
-                className={layout.btnPrimary}
-                value={sortByPrice}
-                onChange={(e) => setSortByPrice(e.target.value as 'asc' | 'desc')}
-              >
-                <option value="asc">Цена: по возрастанию</option>
-                <option value="desc">Цена: по убыванию</option>
-              </select>
-              <select
-                className={layout.btnPrimary}
-                value={tab}
-                onChange={(e) => {
-                  setTab(e.target.value as 'all' | 'new');
-                  setPage(1);
-                }}
-              >
-                <option value="all">Все товары</option>
-                <option value="new">Новые товары</option>
-              </select>
-            </div>
+        <main className={layout.mainContent}>
+          <div className={styles.catalogHeaderSection}>
+            <h1>Архив воспоминаний</h1>
+            <p>Исследуйте капсулы времени, созданные другими людьми</p>
           </div>
 
-          {loading && (
-            <div className={spinner.loadingState}>
-              <div className={spinner.loader} />
-              <p>Загружаем капсулы времени...</p>
-            </div>
-          )}
+          <div className={layout.container}>
+            <div className={styles.catalogControls}>
+              <SearchBar value={search} onChange={setSearch} />
 
-          {error && (
-            <div className={spinner.errorState}>
-              <p>Ошибка: {error}</p>
-              <button type="button" onClick={() => window.location.reload()} className={layout.btnPrimary}>
-                Попробовать снова
-              </button>
-            </div>
-          )}
+              <div className={styles.tabGroup}>
+                {TABS.map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    className={`${styles.tabBtn} ${filter === tab ? styles.tabBtnActive : ''}`}
+                    onClick={() => { setFilter(tab); setPage(1); }}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
 
-          {!loading && !error && filteredProducts.length > 0 && (
-            <>
-              <ProductList
-                products={paged}
-                likesMap={likesMap}
-                dislikesMap={dislikesMap}
-                userReactions={userReactions}
-                onLike={handleLike}
-                onDislike={handleDislike}
-                onOpen={handleOpen}
-              />
-              <div className={styles.catalogControls}>
-                <button
-                  type="button"
-                  className={layout.btnPrimary}
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                >
-                  Назад
-                </button>
-                <span>{page} / {totalPages}</span>
-                <button
-                  type="button"
-                  className={layout.btnPrimary}
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                >
-                  Вперёд
+              <div className={styles.filterRow}>
+                <div className={styles.selectWrapper}>
+                  <svg className={styles.selectIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <select
+                    className={styles.filterSelect}
+                    value={sortByNewest}
+                    onChange={(e) => setSortByNewest(e.target.value as 'all' | 'newest')}
+                  >
+                    <option value="all">All Items</option>
+                    <option value="newest">Newest First</option>
+                  </select>
+                </div>
+
+                <div className={styles.selectWrapper}>
+                  <svg className={styles.selectIcon} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="12" y1="3" x2="12" y2="21" />
+                    <polyline points="8 7 12 3 16 7" />
+                    <polyline points="16 17 12 21 8 17" />
+                  </svg>
+                  <select
+                    className={styles.filterSelect}
+                    value={sortByPrice}
+                    onChange={(e) => setSortByPrice(e.target.value as 'asc' | 'desc')}
+                  >
+                    <option value="asc">Sort by Price ↑</option>
+                    <option value="desc">Sort by Price ↓</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {loading && (
+              <div className={spinner.loadingState}>
+                <div className={spinner.loader} />
+                <p>Загружаем капсулы времени...</p>
+              </div>
+            )}
+
+            {error && (
+              <div className={spinner.errorState}>
+                <p>Ошибка: {error}</p>
+                <button type="button" onClick={() => window.location.reload()} className={layout.btnPrimary}>
+                  Попробовать снова
                 </button>
               </div>
-            </>
-          )}
+            )}
 
-          {!loading && !error && filteredProducts.length === 0 && (
-            <div className={spinner.emptyState}>
-              <p>Ничего не найдено</p>
-              <p className={spinner.emptyHint}>Попробуйте изменить параметры поиска</p>
-            </div>
-          )}
-        </div>
-      </main>
+            {!loading && !error && filteredProducts.length > 0 && (
+              <>
+                <ProductList
+                  products={paged}
+                  likesMap={likesMap}
+                  dislikesMap={dislikesMap}
+                  userReactions={userReactions}
+                  onLike={handleLike}
+                  onDislike={handleDislike}
+                  onOpen={handleOpen}
+                />
+                <div className={styles.pagination}>
+                  <button
+                    type="button"
+                    className={styles.paginationBtn}
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  >
+                    Назад
+                  </button>
+                  <span className={styles.pageIndicator}>{page} / {totalPages}</span>
+                  <button
+                    type="button"
+                    className={styles.paginationBtn}
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Вперёд
+                  </button>
+                </div>
+              </>
+            )}
+
+            {!loading && !error && filteredProducts.length === 0 && (
+              <div className={spinner.emptyState}>
+                <p>Ничего не найдено</p>
+                <p className={spinner.emptyHint}>Попробуйте изменить параметры поиска</p>
+              </div>
+            )}
+          </div>
+        </main>
       <Footer />
     </div>
   );

@@ -1,6 +1,11 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .pageHeader {
   text-align: center;
-  padding: 4rem 5% 3rem;
+  padding: 2.5rem 5% 1.5rem;
   background: radial-gradient(
     circle at 50% 50%,
     rgba(var(--ml-primary-rgb), 0.15),
@@ -26,13 +31,12 @@
 }
 
 .section {
-  padding: 0 5% 5rem;
+  padding: 0 5% 2.5rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .card {
   background: var(--ml-card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--ml-border-light);
   border-radius: 24px;
   padding: 2rem;
@@ -97,8 +101,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 6rem;
+  padding: 3rem;
   gap: 1.5rem;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .loader {
@@ -130,4 +135,54 @@
   gap: 2rem;
   margin-top: 2rem;
   font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .pageHeader {
+    padding: 1.5rem 5% 1rem;
+  }
+  .pageHeader h1 {
+    font-size: clamp(1.6rem, 5vw, 2rem);
+  }
+  .section {
+    padding: 0 5% 1.5rem;
+  }
+  .card {
+    padding: 1.25rem;
+  }
+  .loadingState {
+    padding: 2rem;
+  }
+  .errorState {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageHeader {
+    padding: 1rem 5% 0.75rem;
+  }
+  .pageHeader h1 {
+    font-size: clamp(1.3rem, 5vw, 1.6rem);
+  }
+  .section {
+    padding: 0 4% 1rem;
+  }
+  .card {
+    padding: 1rem;
+    border-radius: 18px;
+  }
+  .loadingState {
+    padding: 1.5rem;
+  }
+  .errorState {
+    padding: 1.5rem;
+  }
+  .row {
+    flex-direction: column;
+  }
+  .input {
+    min-width: auto;
+    width: 100%;
+  }
 }

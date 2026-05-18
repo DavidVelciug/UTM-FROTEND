@@ -83,9 +83,9 @@ const AdminStats: React.FC = () => {
   };
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
+        <main className={layout.mainContent}>
         <div className={statsStyles.pageHeader}>
           <h1>Админ-Панель</h1>
           <p>Мониторинг активности пользователей и глобальная конфигурация экосистемы в реальном времени.</p>

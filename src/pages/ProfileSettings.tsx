@@ -60,9 +60,9 @@ const ProfileSettings: React.FC = () => {
   };
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={`${layout.mainContent} ${layout.fadeIn}`}>
+        <main className={`${layout.mainContent} ${layout.fadeIn}`}>
         <div className={page.pageHeader}>
           <h1 className={layout.textGradient}>Настройки профиля</h1>
           <p>Ваше личное пространство в Memory Lane.</p>

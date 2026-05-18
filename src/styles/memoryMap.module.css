@@ -1,11 +1,17 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .pageHeader {
   text-align: center;
-  padding: 5rem 5% 4rem;
+  padding: 2.5rem 5% 1.5rem;
   background: radial-gradient(
     circle at 50% 50%,
     rgba(var(--ml-primary-rgb), 0.15),
     transparent 70%
   );
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .pageHeader h1 {
@@ -28,7 +34,8 @@
 }
 
 .section {
-  padding: 0 5% 6rem;
+  padding: 0 5% 2.5rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .muted {
@@ -48,7 +55,6 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
   margin-top: 2rem;
   background: var(--ml-card-bg);
-  backdrop-filter: blur(10px);
 }
 
 .mapWrap :global(.leaflet-container) {
@@ -122,8 +128,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 10rem 0;
+  padding: 3rem 0;
   gap: 1.5rem;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .loader {
@@ -146,4 +153,73 @@
   background: rgba(239, 68, 68, 0.1);
   border-radius: 24px;
   margin: 2rem 0;
+}
+
+@media (max-width: 768px) {
+  .pageHeader {
+    padding: 1.5rem 5% 0.9rem;
+  }
+  .pageHeader h1 {
+    font-size: clamp(1.8rem, 6vw, 2.4rem);
+  }
+  .pageHeader p {
+    font-size: 1rem;
+  }
+  .section {
+    padding: 0 5% 1.5rem;
+  }
+  .mapWrap {
+    height: 350px;
+    border-radius: 20px;
+  }
+  .mapHint {
+    margin-top: 0.9rem;
+  }
+  .popupButton {
+    padding: 0.4rem;
+  }
+  .loadingState {
+    padding: 2rem 0;
+    gap: 1rem;
+  }
+  .errorState {
+    padding: 2.5rem;
+    margin: 1.2rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageHeader {
+    padding: 1rem 5% 0.6rem;
+  }
+  .pageHeader h1 {
+    font-size: clamp(1.4rem, 6vw, 1.8rem);
+  }
+  .pageHeader p {
+    font-size: 0.9rem;
+  }
+  .section {
+    padding: 0 4% 1rem;
+  }
+  .mapWrap {
+    height: 280px;
+    border-radius: 16px;
+    margin-top: 1rem;
+  }
+  .mapHint {
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+  }
+  .popupButton {
+    padding: 0.3rem;
+    font-size: 0.85rem;
+  }
+  .loadingState {
+    padding: 1.5rem 0;
+    gap: 0.75rem;
+  }
+  .errorState {
+    padding: 1.5rem;
+    margin: 0.8rem 0;
+  }
 }

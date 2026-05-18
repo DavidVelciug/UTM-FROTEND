@@ -75,9 +75,9 @@ const AdminUsers: React.FC = () => {
   };
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
+        <main className={layout.mainContent}>
         <div className={styles.pageHeader}>
           <h1 className={layout.fadeIn}>Управление пользователями</h1>
           <p className={layout.fadeIn}>Администрирование ролей, поиск и фильтрация участников сообщества.</p>

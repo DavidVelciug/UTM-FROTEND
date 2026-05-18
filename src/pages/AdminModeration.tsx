@@ -89,9 +89,9 @@ const AdminModeration: React.FC = () => {
   };
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
+        <main className={layout.mainContent}>
         <div className={styles.pageHeader}>
           <h1 className={layout.fadeIn}>Модерация</h1>
           <p className={layout.fadeIn}>Эстетичная панель управления безопасностью и контентом платформы.</p>

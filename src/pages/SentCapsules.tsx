@@ -60,9 +60,9 @@ const SentCapsules: React.FC = () => {
   const visible = sorted.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
+        <main className={layout.mainContent}>
         <div className={styles.pageHeader}>
           <h1 className={layout.fadeIn}>Присланные капсулы</h1>
           <p className={layout.fadeIn}>Послания из прошлого, отправленные специально для вас. Дождитесь нужного момента, чтобы раскрыть их тайны.</p>

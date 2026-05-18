@@ -49,9 +49,9 @@ const CapsuleView: React.FC = () => {
     capsule ? getAvatarByUserId(capsule.ownerUserId) || resolveUserAvatar(capsule.ownerUserId, capsule.ownerDisplayName) : '';
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={`${layout.mainContent} ${layout.fadeIn}`}>
+        <main className={`${layout.mainContent} ${layout.fadeIn}`}>
         <div className={`${layout.container} ${detail.wrap}`}>
           {!capsule && <div className={layout.container}>Капсула не найдена.</div>}
           {capsule && (

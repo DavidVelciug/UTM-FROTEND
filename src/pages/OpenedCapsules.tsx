@@ -45,9 +45,9 @@ const OpenedCapsules: React.FC = () => {
   const paginatedItems = items.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
+        <main className={layout.mainContent}>
         <div className={styles.pageHeader}>
           <h1 className={layout.fadeIn}>Открытые капсулы</h1>
           <p className={layout.fadeIn}>Ваша персональная коллекция воспоминаний. Здесь хранятся все капсулы, которые вы когда-либо распаковали.</p>

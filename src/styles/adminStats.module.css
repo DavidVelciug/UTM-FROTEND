@@ -1,6 +1,11 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .pageHeader {
   text-align: center;
-  padding: 5rem 5% 4rem;
+  padding: 2.5rem 5% 1.5rem;
   background: radial-gradient(
     circle at 50% 50%,
     rgba(var(--ml-primary-rgb), 0.15),
@@ -28,13 +33,12 @@
 }
 
 .section {
-  padding: 0 5% 6rem;
+  padding: 0 5% 2.5rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .card {
   background: var(--ml-card-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--ml-border-light);
   border-radius: 28px;
   padding: 2.5rem;
@@ -239,8 +243,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 10rem 0;
-  gap: 2rem;
+  padding: 3rem 0;
+  gap: 1.5rem;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .loader {
@@ -263,4 +268,89 @@
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 24px;
   color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .pageHeader {
+    padding: 1.5rem 5% 1rem;
+  }
+  .pageHeader h1 {
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+  }
+  .section {
+    padding: 0 5% 1.5rem;
+  }
+  .card {
+    padding: 1.5rem;
+  }
+  .summary {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .summaryValue {
+    font-size: 2rem;
+  }
+  .chartGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  .chartCard {
+    padding: 1.25rem;
+    height: auto;
+  }
+  .categoryItem {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+  .categoryForm {
+    flex-direction: column;
+  }
+  .loadingState {
+    padding: 2rem 0;
+  }
+  .errorState {
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageHeader {
+    padding: 1rem 5% 0.75rem;
+  }
+  .pageHeader h1 {
+    font-size: clamp(1.4rem, 5vw, 1.8rem);
+  }
+  .section {
+    padding: 0 4% 1rem;
+  }
+  .card {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+  .summary {
+    gap: 1rem;
+  }
+  .summaryValue {
+    font-size: 1.6rem;
+  }
+  .chartGrid {
+    gap: 1rem;
+  }
+  .chartCard {
+    padding: 1rem;
+  }
+  .categoryItem {
+    padding: 0.75rem;
+  }
+  .categoryHeading {
+    font-size: 1.35rem;
+  }
+  .loadingState {
+    padding: 1.5rem 0;
+  }
+  .errorState {
+    padding: 1.5rem;
+  }
 }

@@ -193,9 +193,9 @@ const CreateCapsule: React.FC = () => {
   };
 
   return (
-    <div className={`${layout.pageWrapper} ${styles.beautifyPage}`}>
+    <div className={`${layout.pageWrapper} ${styles.beautifyPage} ${layout.withBg}`}>
       <Header />
-      <main className={`${layout.mainContent} ${styles.fadeInPage}`}>
+        <main className={`${layout.mainContent} ${styles.fadeInPage}`}>
         <div className={`${page.pageHeader} ${styles.aestheticHeader}`}>
           <h1 className={styles.gradientTitle}>Создание капсулы</h1>
           <p className={styles.subtitle}>Запечатайте сообщение, добавьте место на карте и откройте его в будущем.</p>

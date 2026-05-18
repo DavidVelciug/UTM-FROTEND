@@ -1,8 +1,14 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .loadingState {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 5rem;
+  padding: 3rem;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .loader {

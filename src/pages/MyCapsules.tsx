@@ -113,9 +113,9 @@ const MyCapsules: React.FC = () => {
   const visible = sorted.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
+        <main className={layout.mainContent}>
         <div className={styles.pageHeader}>
           <div className={layout.container}>
             <h1>Мои Капсулы</h1>
@@ -244,9 +244,9 @@ const MyCapsules: React.FC = () => {
                 className={layout.btnPrimary} 
                 disabled={pageIndex <= 1} 
                 onClick={() => { setPageIndex((p) => p - 1); window.scrollTo(0, 0); }}
-                style={{padding: '0.5rem 1rem'}}
+                style={{padding: '0.5rem 1.8rem'}}
               >
-                ← Назад
+                Назад
               </button>
               <span className={styles.pageInfo}>{pageIndex} / {totalPages}</span>
               <button 
@@ -254,9 +254,9 @@ const MyCapsules: React.FC = () => {
                 className={layout.btnPrimary} 
                 disabled={pageIndex >= totalPages} 
                 onClick={() => { setPageIndex((p) => p + 1); window.scrollTo(0, 0); }}
-                style={{padding: '0.5rem 1rem'}}
+                style={{padding: '0.5rem 1.8rem'}}
               >
-                Вперед →
+                Вперёд
               </button>
             </div>
           )}

@@ -14,6 +14,7 @@ import AdminUsers from './pages/AdminUsers';
 import OpenedCapsules from './pages/OpenedCapsules';
 import CapsuleView from './pages/CapsuleView';
 import FeedCapsuleView from './pages/FeedCapsuleView';
+import SentCapsules from './pages/SentCapsules';
 import ErrorPage from './pages/ErrorPage';
 import ModerationCapsuleReview from './pages/ModerationCapsuleReview';
 import FAQ from './pages/FAQ';
@@ -63,6 +64,10 @@ function App() {
         <Route
           path="/opened-capsules"
           element={<ProtectedRoute guard="extended" element={<OpenedCapsules />} />}
+        />
+        <Route
+          path="/sent-capsules"
+          element={<ProtectedRoute guard="extended" element={<SentCapsules />} />}
         />
         <Route path="/capsule-view/:capsuleId" element={<ProtectedRoute guard="extended" element={<CapsuleView />} />} />
         <Route path="/feed" element={<ProtectedRoute guard="extended" element={<PublicFeed />} />} />

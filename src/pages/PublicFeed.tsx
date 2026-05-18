@@ -94,9 +94,9 @@ const PublicFeed: React.FC = () => {
   const paged = sorted.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={`${layout.mainContent} ${layout.fadeIn} ${feed.feedBackdrop}`}>
+        <main className={`${layout.mainContent} ${layout.fadeIn} ${feed.feedBackdrop}`}>
         <div className={feed.pageHeader}>
           <h1 className={layout.textGradient}>Публичные воспоминания</h1>
           <p>Общая лента открытых капсул — делитесь моментами прошлого.</p>
@@ -195,7 +195,7 @@ const PublicFeed: React.FC = () => {
           {!loadingFeed && sorted.length > pageSize && (
             <div className={feed.paginationMini}>
               <button type="button" disabled={pageIndex <= 1} onClick={() => setPageIndex((p) => p - 1)}>
-                ←
+                Назад
               </button>
               <span>
                 {pageIndex} / {Math.ceil(sorted.length / pageSize)}
@@ -205,7 +205,7 @@ const PublicFeed: React.FC = () => {
                 disabled={pageIndex >= Math.ceil(sorted.length / pageSize)}
                 onClick={() => setPageIndex((p) => p + 1)}
               >
-                →
+                Вперёд
               </button>
             </div>
           )}

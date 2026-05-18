@@ -33,6 +33,7 @@ const ProductList: React.FC<ProductListProps> = ({
           price={product.price}
           image={product.image}
           description={product.description}
+          creatorName={product.creatorName}
           likesCount={likesMap[product.id] ?? 0}
           dislikesCount={dislikesMap[product.id] ?? 0}
           userReaction={userReactions[product.id] ?? null}

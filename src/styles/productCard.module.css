@@ -1,6 +1,6 @@
 .productGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
   margin: 2rem 0;
 }
@@ -11,8 +11,7 @@
   overflow: hidden;
   border: 1px solid var(--border);
   transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-  cursor: pointer;
-  position: relative;
+  display: flex;
 }
 
 .productCard:hover {
@@ -21,71 +20,187 @@
   border-color: var(--primary);
 }
 
-.productImage {
+.cardImageWrap {
+  width: 200px;
+  height: 200px;
+  flex-shrink: 0;
+  overflow: hidden;
+  aspect-ratio: 1;
+}
+
+.cardImage {
   width: 100%;
-  height: 220px;
+  height: 100%;
   object-fit: cover;
   transition: transform 0.5s;
 }
 
-.productCard:hover .productImage {
+.productCard:hover .cardImage {
   transform: scale(1.05);
 }
 
-.productInfo {
+.cardBody {
+  flex: 1;
   padding: 1.5rem;
-  position: relative;
-  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.productName {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--text);
-}
-
-.productDescription {
-  color: var(--text-dim);
-  font-size: 0.95rem;
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
-}
-
-.productPrice {
-  font-size: 1.5rem;
+.cardTitle {
+  font-size: 1.2rem;
   font-weight: 700;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 1rem;
+  color: var(--text);
+  margin: 0;
 }
 
-.likeBtn {
-  width: 100%;
-  padding: 0.7rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+.cardAuthor {
+  font-size: 0.85rem;
   color: var(--text-dim);
+  margin: 0;
+}
+
+.authorName {
+  color: var(--primary);
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s;
+}
+
+.authorStatus {
+  color: var(--text-darker);
+  font-size: 0.8rem;
+}
+
+.priceBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  width: fit-content;
+}
+
+.cardDescription {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+  flex: 1;
+}
+
+.cardDate {
+  color: var(--text-darker);
+  font-size: 0.8rem;
+  margin: 0;
+}
+
+.cardFooter {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.reactions {
+  display: flex;
   gap: 0.5rem;
-  font-size: 0.95rem;
 }
 
-.likeBtn:hover {
-  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+.reactBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reactBtn:hover {
   border-color: var(--primary);
-  color: var(--text);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 8%, var(--surface));
 }
 
-.likeBtnLiked {
-  background: color-mix(in srgb, var(--secondary) 24%, var(--surface));
+.reactBtnLiked {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+}
+
+.reactBtnDisliked {
   border-color: var(--secondary);
-  color: var(--text);
+  color: var(--secondary);
+  background: color-mix(in srgb, var(--secondary) 12%, var(--surface));
+}
+
+.unpackBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  white-space: nowrap;
+}
+
+.unpackBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--primary) 40%, transparent);
+}
+
+.unpackBtn:active {
+  transform: translateY(0);
+}
+
+.openedHint {
+  color: var(--primary);
+  font-size: 0.8rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .productGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .productCard {
+    flex-direction: column;
+  }
+
+  .cardImageWrap {
+    width: 100%;
+    height: 200px;
+  }
+
+  .cardFooter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reactions {
+    justify-content: center;
+  }
+
+  .unpackBtn {
+    width: 100%;
+    justify-content: center;
+  }
 }

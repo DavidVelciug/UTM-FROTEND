@@ -1,12 +1,11 @@
 .feedBackdrop {
   flex: 1;
   width: 100%;
-  background: var(--background);
 }
 
 .pageHeader {
   text-align: center;
-  padding: 3rem 5% 2rem;
+  padding: 2.5rem 5% 1.5rem;
   background: radial-gradient(
     circle at 50% 50%,
     color-mix(in srgb, var(--primary) 10%, transparent),
@@ -29,7 +28,7 @@
 .feedContainer {
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem 5% 5rem;
+  padding: 1.5rem 5% 2.5rem;
 }
 
 .chatTimeline {
@@ -242,23 +241,31 @@
   justify-content: center;
   align-items: center;
   gap: 1.5rem;
-  margin-top: 4rem;
+  margin: 2rem 0 2.5rem;
 }
 
 .paginationMini button {
-  background: var(--surface-light);
-  border: 1px solid var(--border);
-  color: var(--text);
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  padding: 0.65rem 1.8rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: var(--shadow-md);
 }
 
 .paginationMini button:hover:not(:disabled) {
-  border-color: var(--primary);
-  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.paginationMini button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .modalOverlay {
@@ -343,4 +350,73 @@
 .muted {
   color: var(--text-dim);
   font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .pageHeader {
+    padding: 1.5rem 5% 1rem;
+  }
+
+  .pageHeader h1 {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .feedContainer {
+    padding: 1rem 4% 1.5rem;
+  }
+
+  .chatTimeline {
+    gap: 1.25rem;
+  }
+
+  .messageBubble {
+    padding: 1rem;
+  }
+
+  .statusMsg {
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .paginationMini {
+    gap: 1rem;
+    margin: 1.5rem 0 1.5rem;
+  }
+
+  .modalBody {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageHeader {
+    padding: 1rem 4% 0.75rem;
+  }
+
+  .pageHeader h1 {
+    font-size: clamp(1.25rem, 6vw, 1.5rem);
+  }
+
+  .feedContainer {
+    padding: 0.75rem 3% 1rem;
+  }
+
+  .chatTimeline {
+    gap: 1rem;
+  }
+
+  .messageBubble {
+    padding: 0.75rem;
+    border-radius: 4px 14px 14px 14px;
+  }
+
+  .paginationMini {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .modalBody {
+    padding: 1.25rem;
+    border-radius: 24px;
+  }
 }

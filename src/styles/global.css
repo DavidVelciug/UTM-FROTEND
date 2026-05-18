@@ -15,6 +15,8 @@
   --shadow-lg: 0 18px 38px rgba(24, 35, 69, 0.12);
   --shadow-md: 0 10px 22px rgba(24, 35, 69, 0.08);
   --shadow-sm: 0 4px 14px rgba(24, 35, 69, 0.06);
+  --bg-pattern: url('/assets/lighttheme.png');
+  --bg-pattern-overlay: rgba(244, 246, 255, 0.80);
 }
 
 html {
@@ -40,6 +42,8 @@ html {
   --gradient-primary: linear-gradient(135deg, #9b8bff, #f56ab4);
   --shadow-lg: 0 18px 38px rgba(1, 4, 16, 0.5);
   --shadow-md: 0 10px 22px rgba(1, 4, 16, 0.34);
+  --bg-pattern: url('/assets/darktheme.png');
+  --bg-pattern-overlay: rgba(9, 11, 25, 0.80);
 }
 
 * {

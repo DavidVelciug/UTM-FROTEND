@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2d2f43"/>
+      <stop offset="100%" stop-color="#5b4cc8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#g)"/>
+  <circle cx="250" cy="200" r="120" fill="#ffffff22"/>
+  <circle cx="950" cy="560" r="150" fill="#ffffff1a"/>
+  <rect x="310" y="250" width="580" height="300" rx="36" fill="#ffffff1f" stroke="#ffffff35" stroke-width="4"/>
+  <text x="600" y="390" text-anchor="middle" font-size="56" fill="#fff" font-family="Arial, sans-serif">MemoryLane</text>
+  <text x="600" y="455" text-anchor="middle" font-size="32" fill="#d9d9ff" font-family="Arial, sans-serif">1;>6:0 :0?AC;K</text>
+</svg>

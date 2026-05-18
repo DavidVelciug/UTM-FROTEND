@@ -1,12 +1,18 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .pageHeader {
   text-align: center;
-  padding: 5rem 5% 4rem;
+  padding: 2.5rem 5% 1.5rem;
   background: radial-gradient(
     circle at 50% 50%,
     rgba(var(--ml-primary-rgb), 0.15),
     transparent 70%
   );
   position: relative;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .pageHeader h1 {
@@ -29,7 +35,8 @@
 }
 
 .section {
-  padding: 0 5% 6rem;
+  padding: 0 5% 2.5rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .grid {
@@ -40,14 +47,11 @@
 
 .card {
   background: var(--ml-card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--ml-border-light);
   border-radius: 28px;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  padding: 2.5rem;
+  transition: all 0.4s ease;
+  position: relative;
 }
 
 .card:hover {
@@ -110,8 +114,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 10rem 0;
+  padding: 3rem 0;
   gap: 1.5rem;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .loader {
@@ -129,22 +134,84 @@
 
 .emptyState {
   text-align: center;
-  padding: 8rem 0;
+  padding: 3rem 0;
   color: var(--ml-text-dim);
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
-  margin-top: 4rem;
+  gap: 1.5rem;
+  margin: 2rem 0 2.5rem;
 }
 
 .pageNumber {
   font-weight: 700;
-  background: var(--ml-gradient-aesthetic);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1rem;
+  color: var(--ml-text-main);
+  font-feature-settings: "tnum";
+}
+
+@media (max-width: 768px) {
+  .pageHeader {
+    padding: 1.5rem 5% 1rem;
+  }
+
+  .pageHeader h1 {
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+  }
+
+  .section {
+    padding: 0 4% 1.5rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .loadingState {
+    padding: 2rem 0;
+  }
+
+  .emptyState {
+    padding: 2rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .pageHeader {
+    padding: 1rem 4% 0.75rem;
+  }
+
+  .pageHeader h1 {
+    font-size: clamp(1.4rem, 6vw, 1.75rem);
+  }
+
+  .section {
+    padding: 0 3% 1rem;
+  }
+
+  .grid {
+    gap: 1rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+    border-radius: 20px;
+  }
+
+  .loadingState {
+    padding: 1.5rem 0;
+  }
+
+  .emptyState {
+    padding: 1.5rem 0;
+  }
 }

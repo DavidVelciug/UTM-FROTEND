@@ -1,7 +1,4 @@
 .beautifyPage {
-  background-color: var(--ml-page-bg);
-  background-image: radial-gradient(circle at 10% 20%, rgba(var(--ml-primary-rgb), 0.05) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(var(--ml-accent-rgb), 0.05) 0%, transparent 40%);
 }
 
 .fadeInPage {
@@ -14,7 +11,7 @@
 }
 
 .aestheticHeader {
-  padding: 6rem 5% 2rem; 
+  padding: 2.5rem 5% 1.5rem; 
   text-align: center;
 }
 
@@ -46,10 +43,9 @@
 
 .createCapsuleCard {
   max-width: 800px;
-  margin: 0 auto 4rem;
-  padding: 3rem;
+  margin: 0 auto 2.5rem;
+  padding: 2rem;
   background-color: var(--ml-card-bg);
-  backdrop-filter: blur(15px); 
   border: 1px solid var(--ml-border-light);
   border-radius: 40px; 
   box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4); 

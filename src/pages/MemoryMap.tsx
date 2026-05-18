@@ -112,9 +112,9 @@ const MemoryMap: React.FC = () => {
     visibleLocations.length > 0 ? [visibleLocations[0].latitude, visibleLocations[0].longitude] : [48.8566, 2.3522];
 
   return (
-    <div className={layout.pageWrapper}>
+    <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={layout.mainContent}>
+        <main className={layout.mainContent}>
         <div className={styles.pageHeader}>
           <h1 className={layout.fadeIn}>География Памяти</h1>
           <p className={layout.fadeIn}>Исследуйте капсулы времени, оставленные в самых значимых уголках мира.</p>

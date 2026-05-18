@@ -16,9 +16,19 @@
 
 .pageWrapper {
   min-height: 100vh;
-  background: var(--background);
+  background-color: var(--background);
   display: flex;
   flex-direction: column;
+}
+
+.withBg {
+  background-color: var(--background);
+  background-image:
+    linear-gradient(var(--bg-pattern-overlay), var(--bg-pattern-overlay)),
+    var(--bg-pattern);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .btnPrimary {
@@ -101,6 +111,12 @@
   }
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 4%;
+  }
+}
+
 /* --- layout.module.css --- */
 
 /* Определение переменных для тем.
@@ -111,9 +127,9 @@
 :root,
 :global(body.dark-theme) {
   --ml-page-bg: #050609; /* Глубокий темный */
-  --ml-card-bg: rgba(20, 22, 30, 0.6); /* Glassmorphism темный */
-  --ml-input-bg: rgba(0, 0, 0, 0.3);
-  --ml-input-bg-focus: rgba(0, 0, 0, 0.5);
+  --ml-card-bg: #14161e; /* Карточки непрозрачные тёмные */
+  --ml-input-bg: #1e2035;
+  --ml-input-bg-focus: #282a45;
   --ml-border-light: rgba(255, 255, 255, 0.08);
   --ml-surface: #14161e;
   --ml-text-main: #ffffff;
@@ -129,7 +145,7 @@
 /* Светлая тема */
 :global(body.light-theme) {
   --ml-page-bg: #f9fafb; /* Очень светлый серый */
-  --ml-card-bg: rgba(255, 255, 255, 0.8); /* Glassmorphism светлый */
+  --ml-card-bg: #ffffff; /* Карточки непрозрачные светлые */
   --ml-input-bg: #ffffff;
   --ml-input-bg-focus: #f3f4f6;
   --ml-border-light: rgba(0, 0, 0, 0.08);
