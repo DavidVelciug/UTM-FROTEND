@@ -67,22 +67,28 @@ const OpenedCapsules: React.FC = () => {
                 </div>
               ) : (
                 <div className={`${styles.grid} ${layout.fadeIn}`}>
-                  {paginatedItems.map((item) => (
+                    {paginatedItems.map((item) => (
                     <article key={item.id} className={styles.card}>
-                      <span className={styles.badge}>Распакована</span>
-                      <h2>{item.title}</h2>
-                      <p className={styles.muted}>{item.previewText || 'Эта капсула успешно открыта и доступна для просмотра в любое время.'}</p>
-                      
-                      <div className={styles.infoGroup}>
-                        <p className={styles.hint}>Источник: <span>{item.openedFrom ?? 'Неизвестно'}</span></p>
-                        <p className={styles.hint}>Дата открытия: <span>{new Date(item.openedAtUtc ?? item.openAtUtc).toLocaleDateString('ru-RU')}</span></p>
+                      <div className={styles.cardImage}>
+                        <h2 className={styles.cardTitle}>{item.title}</h2>
+                        <p className={styles.muted}>{item.previewText || 'Эта капсула успешно открыта и доступна для просмотра в любое время.'}</p>
+
+                        <div className={styles.cardContent}>
+                          <div className={styles.infoGroup}>
+                            <p className={styles.hint}>Тип капсулы: <span>{item.isPublic ? 'Публичная' : 'Приватная'}</span></p>
+                            <p className={styles.hint}>Дата открытия: <span>{new Date(item.openedAtUtc ?? item.openAtUtc).toLocaleDateString('ru-RU')}</span></p>
+                            <p className={styles.hint}>Источник: <span>{item.openedFrom ?? 'Неизвестно'}</span></p>
+                          </div>
+                        </div>
                       </div>
 
-                      <Link to={`/capsule-view/${item.id}`} className={`${layout.btnPrimary} ${layout.mt2}`} style={{ width: '100%' }}>
-                        Открыть содержимое
-                      </Link>
+                      <div className={styles.cardActions}>
+                        <Link to={`/capsule-view/${item.id}`} className={styles.viewBtn}>
+                          Открыть содержимое
+                        </Link>
+                      </div>
                     </article>
-                  ))}
+                    ))}
                 </div>
               )}
 
