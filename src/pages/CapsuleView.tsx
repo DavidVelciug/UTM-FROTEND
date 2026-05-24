@@ -39,7 +39,7 @@ const CapsuleView: React.FC = () => {
       .then((c) => {
         setCapsule(c);
         if (!c.isLocked) {
-          addOpenedCapsule(c, c.isPublic ? 'Каталог' : 'Присланные капсулы');
+          addOpenedCapsule(c, c.isPublic ? 'Капсула каталога' : 'Присланная капсула');
         }
       })
       .catch(() => setCapsule(null));

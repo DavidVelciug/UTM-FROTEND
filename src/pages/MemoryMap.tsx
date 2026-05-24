@@ -13,6 +13,7 @@ import styles from '../styles/MemoryMap.module.css';
 import { fetchJson } from '../config/api';
 import type { CapsuleLocationDto, TimeCapsuleDto, UserAccountDto } from '../types/api';
 import { getCurrentUserId } from '../auth/session';
+import { addOpenedCapsule } from '../auth/capsuleStore';
 import { getCapsuleThumbnailUrl } from '../utils/file';
 
 const MemoryMap: React.FC = () => {
@@ -174,6 +175,8 @@ const MemoryMap: React.FC = () => {
                                 onClick={() => {
                                   const dist = distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude);
                                   if (dist <= 10) {
+                                    const cap = capsuleById[l.capsuleId];
+                                    if (cap) addOpenedCapsule(cap, 'Гео-капсула');
                                     navigate(`/feed-capsule/${l.capsuleId}`);
                                     return;
                                   }

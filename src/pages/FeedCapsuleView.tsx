@@ -23,7 +23,7 @@ const FeedCapsuleView: React.FC = () => {
       .then((data) => {
         setCapsule(data);
         if (!data.isLocked) {
-          addOpenedCapsule(data, 'Лента');
+          addOpenedCapsule(data, 'Публичная капсула');
         }
       })
       .catch(() => setCapsule(null));

@@ -21,13 +21,18 @@ export function getOpenedCapsules(): OpenedCapsuleItem[] {
 
 export function addOpenedCapsule(capsule: TimeCapsuleDto, openedFrom?: string): void {
   const list = getOpenedCapsules();
-  if (list.some((item) => item.id === capsule.id)) {
+  const source = openedFrom ?? capsule.openedFrom ?? (capsule.isPublic ? 'Публичная капсула' : 'Присланная капсула');
+  const existing = list.find((item) => item.id === capsule.id);
+  if (existing) {
+    existing.openedFrom = source;
+    existing.openedAtUtc = new Date().toISOString();
+    localStorage.setItem(getOpenedKey(), JSON.stringify(list));
     return;
   }
   list.unshift({
     ...capsule,
     openedAtUtc: new Date().toISOString(),
-    openedFrom: openedFrom ?? capsule.openedFrom ?? (capsule.isPublic ? 'Публичная капсула' : 'Присланная капсула'),
+    openedFrom: source,
   });
   localStorage.setItem(getOpenedKey(), JSON.stringify(list));
 }
