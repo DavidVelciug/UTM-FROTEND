@@ -2,12 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import CapsuleContentPreview from '../components/CapsuleContentPreview';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/sentCapsules.module.css';
 import { fetchJson } from '../config/api';
 import { getCurrentUserId } from '../auth/session';
+import { resolveMediaUrl } from '../utils/file';
 import type { TimeCapsuleDto } from '../types/api';
-import { isImageSource, resolveMediaUrl } from '../utils/file';
 
 function formatCountdown(target: Date, now: Date): string {
   const diff = target.getTime() - now.getTime();
@@ -19,6 +20,12 @@ function formatCountdown(target: Date, now: Date): string {
   return `${days}д ${hours}ч ${mins}м ${secs}с`;
 }
 
+const contentTypeLabels: Record<number, string> = {
+  0: 'Текстовое содержимое',
+  1: 'Веб-ссылка',
+  2: 'Файловое вложение',
+};
+
 const SentCapsules: React.FC = () => {
   const navigate = useNavigate();
   const userId = getCurrentUserId();
@@ -28,6 +35,8 @@ const SentCapsules: React.FC = () => {
   const [pageIndex, setPageIndex] = useState(1);
   const [now, setNow] = useState(() => new Date());
   const [lockedCapsule, setLockedCapsule] = useState<TimeCapsuleDto | null>(null);
+  const [filterLock, setFilterLock] = useState<'all' | 'locked' | 'unlocked'>('all');
+  const [filterByTime, setFilterByTime] = useState<'all' | 'week' | 'month' | '3months' | '12months'>('all');
   const pageSize = 9;
 
   useEffect(() => {
@@ -52,17 +61,46 @@ const SentCapsules: React.FC = () => {
       .finally(() => setLoading(false));
   }, [userId]);
 
-  const sorted = useMemo(
-    () => [...items].sort((a, b) => new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime()),
-    [items],
-  );
-  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
-  const visible = sorted.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
+  const filteredAndSorted = useMemo(() => {
+    let result = [...items];
+
+    if (filterLock !== 'all') {
+      result = result.filter((item) => {
+        const openAt = new Date(item.openAtUtc);
+        const locked = openAt.getTime() > now.getTime();
+        return filterLock === 'locked' ? locked : !locked;
+      });
+    }
+
+    if (filterByTime !== 'all') {
+      const timeLimits: Record<string, number> = {
+        week: 7,
+        month: 30,
+        '3months': 90,
+        '12months': 365,
+      };
+      const maxDays = timeLimits[filterByTime];
+      result = result.filter((item) => {
+        const date = new Date(item.createdAtUtc);
+        const diffDays = (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+        return diffDays <= maxDays;
+      });
+    }
+
+    result.sort((a, b) => {
+      return new Date(b.createdAtUtc).getTime() - new Date(a.createdAtUtc).getTime();
+    });
+
+    return result;
+  }, [items, filterLock, filterByTime, now]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredAndSorted.length / pageSize));
+  const visible = filteredAndSorted.slice((pageIndex - 1) * pageSize, pageIndex * pageSize);
 
   return (
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-        <main className={layout.mainContent}>
+      <main className={layout.mainContent}>
         <div className={styles.pageHeader}>
           <h1 className={layout.fadeIn}>Присланные капсулы</h1>
           <p className={layout.fadeIn}>Послания из прошлого, отправленные специально для вас. Дождитесь нужного момента, чтобы раскрыть их тайны.</p>
@@ -78,89 +116,175 @@ const SentCapsules: React.FC = () => {
 
           {error && <div className={styles.errorState}>{error}</div>}
 
-          {!loading && !error && visible.length === 0 && (
-            <div className={styles.emptyState}>
-              <p>В вашем архиве пока пусто. Капсулы появятся здесь, когда кто-то отправит их вам.</p>
-            </div>
-          )}
-
           {!loading && !error && (
-            <div className={`${styles.grid} ${layout.fadeIn}`}>
-              {visible.map((item) => {
-                const openAt = new Date(item.openAtUtc);
-                const locked = openAt.getTime() > now.getTime();
-                return (
-                  <article key={item.id} className={styles.card}>
-                    <h2>{item.title || 'Безымянная капсула'}</h2>
-                    <p className={styles.muted}>{item.previewText || 'Короткое превью содержимого недоступно.'}</p>
-                    
-                    <div className={styles.mediaWrapper}>
-                      <img
-                        className={styles.coverImage}
-                        src={resolveMediaUrl(item.fileStoragePath, '/assets/default-capsule-cover.svg')}
-                        alt={item.title}
-                        onError={(e) => {
-                          e.currentTarget.src = '/assets/default-capsule-cover.svg';
-                        }}
-                      />
-                    </div>
-
-                    <div className={styles.infoGroup}>
-                      <p className={styles.hint}>Отправитель: <span>{item.ownerDisplayName || 'Аноним'}</span></p>
-                      <p className={styles.hint}>Дата открытия: <span>{openAt.toLocaleDateString('ru-RU')}</span></p>
-                      <p className={styles.hint}>До вскрытия: <span>{formatCountdown(openAt, now)}</span></p>
-                    </div>
-
-                    <button
-                      type="button"
-                      className={layout.btnPrimary}
-                      style={{ marginTop: '1.5rem', width: '100%', filter: locked ? 'grayscale(0.8)' : 'none' }}
-                      onClick={() => {
-                        if (locked) {
-                          setLockedCapsule(item);
-                          return;
-                        }
-                        navigate(`/capsule-view/${item.id}`);
-                      }}
-                    >
-                      {locked ? 'Капсула запечатана' : 'Распаковать сейчас'}
-                    </button>
-                  </article>
-                );
-              })}
-            </div>
-          )}
-
-          {!loading && !error && sorted.length > pageSize && (
-            <div className={styles.pagination}>
-              <button type="button" className={layout.btnPrimary} disabled={pageIndex <= 1} onClick={() => setPageIndex((p) => p - 1)}>
-                Назад
-              </button>
-              <span className={styles.pageNumber}>{pageIndex} / {totalPages}</span>
-              <button type="button" className={layout.btnPrimary} disabled={pageIndex >= totalPages} onClick={() => setPageIndex((p) => p + 1)}>
-                Вперед
-              </button>
-            </div>
-          )}
-
-          {lockedCapsule && (
-            <div className={styles.modalOverlay} onClick={() => setLockedCapsule(null)}>
-              <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-                <h2 className={layout.textGradient}>Время еще не пришло</h2>
-                <p className={styles.muted}>
-                  Это послание защищено временным замком. Оно станет доступным для чтения {new Date(lockedCapsule.openAtUtc).toLocaleString('ru-RU')}.
-                </p>
-                <div className={styles.infoGroup} style={{ border: 'none', marginBottom: '1.5rem' }}>
-                  <p className={styles.hint}>Осталось ждать: <span>{formatCountdown(new Date(lockedCapsule.openAtUtc), now)}</span></p>
+            <>
+              {items.length === 0 ? (
+                <div className={styles.emptyState}>
+                  <p>В вашем архиве пока пусто. Капсулы появятся здесь, когда кто-то отправит их вам.</p>
                 </div>
-                <button type="button" className={layout.btnPrimary} onClick={() => setLockedCapsule(null)}>
-                  Вернуться к списку
-                </button>
-              </div>
-            </div>
+              ) : (
+                <>
+                  <div className={styles.filterRow}>
+                    <div className={styles.selectWrapper}>
+                      <select
+                        className={styles.filterSelect}
+                        value={filterLock}
+                        onChange={(e) => {
+                          setFilterLock(e.target.value as 'all' | 'locked' | 'unlocked');
+                          setPageIndex(1);
+                        }}
+                      >
+                        <option value="all">Все капсулы</option>
+                        <option value="locked">Нельзя открыть</option>
+                        <option value="unlocked">Можно открыть</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.selectWrapper}>
+                      <select
+                        className={styles.filterSelect}
+                        value={filterByTime}
+                        onChange={(e) => {
+                          setFilterByTime(e.target.value as 'all' | 'week' | 'month' | '3months' | '12months');
+                          setPageIndex(1);
+                        }}
+                      >
+                        <option value="all">За всё время</option>
+                        <option value="week">Неделя</option>
+                        <option value="month">Месяц</option>
+                        <option value="3months">3 месяца</option>
+                        <option value="12months">12 месяцев</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {filteredAndSorted.length === 0 ? (
+                    <div className={styles.emptyState}>
+                      <p>Нет капсул, соответствующих выбранным фильтрам.</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className={`${styles.grid} ${layout.fadeIn}`}>
+                        {visible.map((item) => {
+                          const openAt = new Date(item.openAtUtc);
+                          const locked = openAt.getTime() > now.getTime();
+                          return (
+                            <article key={item.id} className={styles.card}>
+                              <div className={styles.cardImage}>
+                                <img src="/assets/closecapsule.png" alt="" className={styles.capsuleBg} />
+                                <h2 className={styles.cardTitle}>{item.title || 'Безымянная капсула'}</h2>
+                                <p className={styles.muted}>{contentTypeLabels[item.contentType] ?? 'Неизвестный тип'}</p>
+
+                                <div className={styles.cardContent}>
+                                  <div className={styles.mediaWrapper}>
+                                    <img
+                                      className={styles.coverImage}
+                                      src={resolveMediaUrl(item.fileStoragePath, '/assets/default-capsule-cover.svg')}
+                                      alt={item.title}
+                                      onError={(e) => {
+                                        e.currentTarget.src = '/assets/default-capsule-cover.svg';
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className={styles.cardActions}>
+                                <div className={styles.actionRow}>
+                                  <button
+                                    type="button"
+                                    className={styles.viewBtn}
+                                    onClick={() => {
+                                      if (locked) {
+                                        setLockedCapsule(item);
+                                        return;
+                                      }
+                                      navigate(`/capsule-view/${item.id}`);
+                                    }}
+                                  >
+                                    {locked ? 'Капсула запечатана' : 'Распаковать сейчас'}
+                                  </button>
+                                  <div className={styles.infoWrap}>
+                                    <svg className={styles.infoIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                      <circle cx="12" cy="12" r="10" />
+                                      <line x1="12" y1="16" x2="12" y2="12" />
+                                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                                    </svg>
+                                    <div className={styles.tooltip}>
+                                      <p className={styles.tooltipItem}>
+                                        <span className={styles.tooltipLabel}>Отправитель:</span>
+                                        <span>{item.ownerDisplayName || 'Аноним'}</span>
+                                      </p>
+                                      <p className={styles.tooltipItem}>
+                                        <span className={styles.tooltipLabel}>Дата открытия:</span>
+                                        <span>{openAt.toLocaleDateString('ru-RU')}</span>
+                                      </p>
+                                      <p className={styles.tooltipItem}>
+                                        <span className={styles.tooltipLabel}>До вскрытия:</span>
+                                        <span>{formatCountdown(openAt, now)}</span>
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </article>
+                          );
+                        })}
+                      </div>
+
+                      {filteredAndSorted.length > pageSize && (
+                        <div className={styles.pagination}>
+                          <button
+                            type="button"
+                            className={layout.btnPrimary}
+                            disabled={pageIndex <= 1}
+                            onClick={() => {
+                              setPageIndex((p) => p - 1);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                          >
+                            Назад
+                          </button>
+                          <span className={styles.pageNumber}>{pageIndex} / {totalPages}</span>
+                          <button
+                            type="button"
+                            className={layout.btnPrimary}
+                            disabled={pageIndex >= totalPages}
+                            onClick={() => {
+                              setPageIndex((p) => p + 1);
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                            }}
+                          >
+                            Вперед
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </>
           )}
         </div>
       </main>
+
+      {lockedCapsule && (
+        <div className={styles.modalOverlay} onClick={() => setLockedCapsule(null)}>
+          <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
+            <h2 className={layout.textGradient}>Время еще не пришло</h2>
+            <p className={styles.muted}>
+              Это послание защищено временным замком. Оно станет доступным для чтения {new Date(lockedCapsule.openAtUtc).toLocaleString('ru-RU')}.
+            </p>
+            <div className={styles.infoGroup} style={{ border: 'none', marginBottom: '1.5rem' }}>
+              <p className={styles.hint}>Осталось ждать: <span>{formatCountdown(new Date(lockedCapsule.openAtUtc), now)}</span></p>
+            </div>
+            <button type="button" className={layout.btnPrimary} onClick={() => setLockedCapsule(null)}>
+              Вернуться к списку
+            </button>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
