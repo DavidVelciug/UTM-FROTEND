@@ -144,20 +144,20 @@
 
 /* Светлая тема */
 :global(body.light-theme) {
-  --ml-page-bg: #f9fafb; /* Очень светлый серый */
+  --ml-page-bg: #fefcf5; /* Тёплый светлый */
   --ml-card-bg: #ffffff; /* Карточки непрозрачные светлые */
   --ml-input-bg: #ffffff;
-  --ml-input-bg-focus: #f3f4f6;
-  --ml-border-light: rgba(0, 0, 0, 0.08);
+  --ml-input-bg-focus: #fef7e6;
+  --ml-border-light: rgba(80, 65, 20, 0.08);
   --ml-surface: #ffffff;
-  --ml-text-main: #111827;
-  --ml-text-dim: #6b7280;
-  --ml-primary-color: #a855f7; /* Фиолетовый MemoryLane для светлой */
+  --ml-text-main: #1a1812;
+  --ml-text-dim: #8a7a3a;
+  --ml-primary-color: #c9a84c; /* Золотой MemoryLane для светлой */
 
   /* Для градиентов и эффектов */
-  --ml-primary-rgb: 168, 85, 247;
-  --ml-accent-rgb: 236, 72, 153; /* Розовый MemoryLane сохраняем */
-  --ml-gradient-aesthetic: linear-gradient(135deg, #6366f1, #ec4899, #a855f7);
+  --ml-primary-rgb: 201, 168, 76;
+  --ml-accent-rgb: 232, 168, 68; /* Тёплый золотой */
+  --ml-gradient-aesthetic: linear-gradient(135deg, #c9a84c, #e8c454, #d4a017);
 }
 
 /* Применение глобальных стилей к wrapper страницы */

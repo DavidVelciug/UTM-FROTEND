@@ -57,7 +57,7 @@
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
   }
   100% {
-    text-shadow: 0 1px 8px rgba(0,0,0,0.2), 0 0 12px rgba(99, 102, 241, 0.3);
+    text-shadow: 0 1px 8px rgba(0,0,0,0.2), 0 0 12px color-mix(in srgb, var(--ml-primary-color) 35%, transparent);
   }
 }
 
@@ -137,7 +137,7 @@
 
 .card:hover {
   transform: translateY(-15px) scale(1.05);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(var(--ml-primary-rgb), 0.25);
 
 }
 
@@ -148,23 +148,24 @@
 
 .card:hover .cardTitle {
   color: var(--ml-primary-color);
-  text-shadow: 0 2px 12px rgba(99, 102, 241, 0.6);
+  text-shadow: 0 1px 4px color-mix(in srgb, var(--ml-primary-color) 50%, transparent);
 }
 
 .card:hover .muted {
-  color: var(--ml-text-main);
+  color: #ffd700;
 }
 
 
 
 .cardTitle {
-  font-size: 1.3rem;
-  font-weight: 800;
-  color: var(--ml-text-main);
+  font-family: 'Caveat', cursive;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ml-primary-color);
   text-align: center;
   letter-spacing: -0.01em;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
-  padding: 1.5rem 1.5rem 0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+  padding: 0.5rem 1.5rem 0.25rem;
   position: relative;
   z-index: 2;
   width: 100%;
@@ -199,7 +200,7 @@
 
 .card:hover {
   transform: translateY(-15px) scale(1.05);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 40px rgba(var(--ml-primary-rgb), 0.25);
 
 }
 
@@ -210,11 +211,11 @@
 
 .card:hover .cardTitle {
   color: var(--ml-primary-color);
-  text-shadow: 0 2px 12px rgba(99, 102, 241, 0.6);
+  text-shadow: 0 1px 4px color-mix(in srgb, var(--ml-primary-color) 50%, transparent);
 }
 
 .card:hover .muted {
-  color: var(--ml-text-main);
+  color: #ffd700;
 }
 
 .card:hover .viewBtn {
@@ -287,7 +288,7 @@
   line-height: 1.4;
   text-align: center;
   max-width: 85%;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
   position: relative;
   z-index: 2;
   padding: 0.5rem 1.5rem 0;
@@ -303,9 +304,9 @@
 
 .hint {
   font-size: 0.85rem;
-  color: var(--ml-text-dim);
+  color: #fff;
   text-align: center;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
   animation: cardHintFade 2.5s ease-in-out infinite alternate;
 }
 
@@ -332,7 +333,7 @@
   gap: 0.5rem;
   padding: 0.85rem 2rem;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--ml-primary-color), #8b5cf6);
+  background: linear-gradient(135deg, var(--ml-primary-color), var(--primary-dark));
   color: #fff;
   font-size: 1rem;
   font-weight: 700;

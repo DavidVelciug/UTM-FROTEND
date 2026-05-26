@@ -1,22 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Lexend:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Lexend:wght@400;500;600;700&family=Caveat:wght@400;600;700&display=swap');
 
 :root {
-  --primary: #6d56f8;
-  --primary-dark: #5942e8;
-  --secondary: #f04ca5;
-  --background: #f4f6ff;
+  --primary: #d4a017;
+  --primary-dark: #b8922b;
+  --secondary: #e8a844;
+  --background: #fefcf5;
   --surface: #ffffff;
-  --surface-light: #f8f9ff;
-  --text: #12172d;
-  --text-dim: #4f5a7a;
-  --text-darker: #7b85a2;
-  --border: #d9def3;
-  --gradient-primary: linear-gradient(135deg, #6d56f8, #f04ca5);
-  --shadow-lg: 0 18px 38px rgba(24, 35, 69, 0.12);
-  --shadow-md: 0 10px 22px rgba(24, 35, 69, 0.08);
-  --shadow-sm: 0 4px 14px rgba(24, 35, 69, 0.06);
+  --surface-light: #fff9e6;
+  --text: #1a1812;
+  --text-dim: #8a7a3a;
+  --text-darker: #b8a450;
+  --border: #ede3b8;
+  --gradient-primary: linear-gradient(135deg, #d4a017, #e8c454);
+  --shadow-lg: 0 18px 38px rgba(80, 65, 20, 0.12);
+  --shadow-md: 0 10px 22px rgba(80, 65, 20, 0.08);
+  --shadow-sm: 0 4px 14px rgba(80, 65, 20, 0.06);
   --bg-pattern: url('/assets/lighttheme.png');
-  --bg-pattern-overlay: rgba(244, 246, 255, 0.80);
+  --bg-pattern-overlay: rgba(254, 252, 245, 0.80);
 }
 
 html {
