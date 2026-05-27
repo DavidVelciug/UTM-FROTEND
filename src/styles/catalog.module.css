@@ -107,7 +107,7 @@
 .filterSelect:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(109, 86, 248, 0.15);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
 .filterSelect:hover {

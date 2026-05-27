@@ -48,7 +48,7 @@
   background-color: var(--ml-card-bg);
   border: 1px solid var(--ml-border-light);
   border-radius: 40px; 
-  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4); 
+  box-shadow: 0 25px 80px rgba(var(--ml-primary-rgb), 0.15); 
   position: relative;
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
@@ -160,7 +160,7 @@
 }
 
 .fileSection {
-  background: rgba(0,0,0,0.05);
+  background: color-mix(in srgb, var(--ml-primary-color) 6%, transparent);
   padding: 1.5rem;
   border-radius: 18px;
   border: 1px dashed var(--ml-border-light);
@@ -298,7 +298,7 @@
 .locationCheckbox input {
   width: 22px;
   height: 22px;
-  accent-color: #ec4899; 
+  accent-color: var(--ml-primary-color); 
   cursor: pointer;
 }
 
@@ -324,7 +324,7 @@
 .coordsLabel {
   font-family: monospace;
   background: var(--ml-surface);
-  color: #ec4899; 
+  color: var(--ml-primary-color); 
   padding: 6px 12px;
   border-radius: 8px;
   display: inline-block;
@@ -343,7 +343,7 @@
 
 .aestheticSubmit:hover:not(:disabled) {
   transform: scale(1.03) !important;
-  box-shadow: 0 10px 30px rgba(236, 72, 153, 0.3) !important;
+  box-shadow: 0 10px 30px rgba(var(--ml-primary-rgb), 0.3) !important;
 }
 
 .btnLoading {
@@ -353,7 +353,7 @@
 
 .statusDisplay {
   margin-top: 1rem;
-  color: #ec4899 !important; 
+  color: var(--ml-primary-color) !important; 
   font-weight: 700;
   animation: fadeIn 0.5s ease;
 }

@@ -52,7 +52,7 @@
   border-radius: 32px;
   overflow: hidden;
   border: 1px solid var(--ml-border-light);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(var(--ml-primary-rgb), 0.15);
   margin-top: 2rem;
   background: var(--ml-card-bg);
 }

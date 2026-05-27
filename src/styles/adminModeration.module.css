@@ -83,7 +83,7 @@
 .card:hover {
   transform: translateY(-5px);
   border-color: rgba(var(--ml-primary-rgb), 0.3);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(var(--ml-primary-rgb), 0.15);
 }
 
 .innerCard {
