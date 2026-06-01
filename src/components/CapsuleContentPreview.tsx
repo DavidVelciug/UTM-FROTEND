@@ -29,7 +29,6 @@ const CapsuleContentPreview: React.FC<Props> = ({ capsule: c }) => {
     try {
       host = new URL(c.linkUrl).hostname;
     } catch {
-      /* ignore */
     }
     const snippet = (c.previewText || '').trim() || 'Откройте ссылку, чтобы перейти к содержимому.';
 

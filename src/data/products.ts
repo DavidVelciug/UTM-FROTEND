@@ -26,7 +26,7 @@ export const products: Product[] = [
     name: "Письмо в 2030 год", 
     price: 1999, 
     category: "Личное", 
-    image: "https://images.unsplash.com/photo-1484807352052-23338990c6c6?w=500", // Письмо в бутылке/старинное письмо
+    image: "https://images.unsplash.com/photo-1484807352052-23338990c6c6?w=500",
     description: "Мои цели на десятилетие",
     creatorName: "Мария",
     creatorEmail: "maria@example.com"

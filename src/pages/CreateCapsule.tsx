@@ -63,7 +63,7 @@ const CreateCapsule: React.FC = () => {
 
   const showOpenAt = capsuleMode !== 'catalog';
   const showRecipient = capsuleMode === 'personal';
-  const showPreviewUpload = capsuleMode !== 'location';
+  const showPreviewUpload = true;
   const showLocationOptions = capsuleMode === 'location' || capsuleMode === 'personal';
 
   useEffect(() => {
@@ -79,7 +79,6 @@ const CreateCapsule: React.FC = () => {
         setCatalogCategories(cats);
         setCatalogCategoryId((prev) => prev || (cats[0] ? String(cats[0].id) : ''));
       } catch {
-        // ignore: категории будут дефолтными
       }
     })();
     return () => {

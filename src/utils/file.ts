@@ -18,7 +18,6 @@ export function resolveMediaUrl(value?: string | null, fallback = ''): string {
   if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('//')) return src;
 
   if (src.startsWith('/')) {
-    // `/uploads/...` должен грузиться с бэкенда (API_BASE), а не с origin фронтенда.
     if (src.startsWith('/uploads/')) return apiUrl(src);
     return src;
   }
@@ -75,14 +74,14 @@ export function getCapsuleThumbnailUrl(c: {
   linkUrl?: string | null;
 }): string {
   const parsed = parseCapsuleStorage(c.fileStoragePath);
-  if (parsed.cover && isImageSource(parsed.cover)) {
+  if (parsed.cover) {
     return resolveMediaUrl(parsed.cover, '/assets/default-capsule-cover.svg');
   }
   const firstAttachment = parsed.attachments[0];
-  if (firstAttachment && isImageSource(firstAttachment)) {
+  if (firstAttachment) {
     return resolveMediaUrl(firstAttachment, '/assets/default-capsule-cover.svg');
   }
-  if (isImageSource(c.fileStoragePath)) {
+  if (c.fileStoragePath) {
     return resolveMediaUrl(c.fileStoragePath, '/assets/default-capsule-cover.svg');
   }
   if (c.contentType === 1 && c.linkUrl) {

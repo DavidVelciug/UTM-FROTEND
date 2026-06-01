@@ -150,45 +150,49 @@ const MemoryMap: React.FC = () => {
                     <Marker key={l.id} position={[l.latitude, l.longitude]}>
                       {cap && (
                         <Tooltip direction="top" offset={[0, -36]} opacity={1}>
-                          <div className={styles.tipInner}>
-                            <img
-                              src={getCapsuleThumbnailUrl(cap)}
-                              alt=""
-                              className={styles.tipImg}
-                            />
-                            <div className={styles.tipTitle}>{cap.title}</div>
+                          <div className={styles.tipWrapper}>
+                            <div className={styles.tipInner}>
+                              <img
+                                src={getCapsuleThumbnailUrl(cap)}
+                                alt=""
+                                className={styles.tipImg}
+                              />
+                              <div className={styles.tipTitle}>{cap.title}</div>
+                            </div>
                           </div>
                         </Tooltip>
                       )}
                       <Popup>
-                        <div className={styles.tipInner}>
-                          <strong style={{fontSize: '1.1rem'}}>{titleById[l.capsuleId] ?? `Капсула #${l.capsuleId}`}</strong>
-                          <div style={{margin: '8px 0', opacity: 0.8}}>{l.placeLabel}</div>
-                          {myPosition ? (
-                            <>
-                              <div style={{fontSize: '0.85rem'}}>
-                                Расстояние: <strong>{distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude).toFixed(2)} км</strong>
-                              </div>
-                              <button
-                                type="button"
-                                className={styles.popupButton}
-                                onClick={() => {
-                                  const dist = distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude);
-                                  if (dist <= 10) {
-                                    const cap = capsuleById[l.capsuleId];
-                                    if (cap) addOpenedCapsule(cap, 'Гео-капсула');
-                                    navigate(`/feed-capsule/${l.capsuleId}`);
-                                    return;
-                                  }
-                                  window.alert('Доступ запрещен. Вам нужно быть в радиусе 10 км от этой точки.');
-                                }}
-                              >
-                                Погрузиться
-                              </button>
-                            </>
-                          ) : (
-                            <div style={{fontSize: '0.8rem', color: '#ef4444'}}>Включите GPS для доступа</div>
-                          )}
+                        <div className={styles.tipWrapper}>
+                          <div className={styles.tipInner}>
+                            <div className={styles.popTitle}>{titleById[l.capsuleId] ?? `Капсула #${l.capsuleId}`}</div>
+                            <div className={styles.popLabel}>{l.placeLabel}</div>
+                            {myPosition ? (
+                              <>
+                                <div className={styles.popDist}>
+                                  Расстояние: <strong>{distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude).toFixed(2)} км</strong>
+                                </div>
+                                <button
+                                  type="button"
+                                  className={styles.popupButton}
+                                  onClick={() => {
+                                    const dist = distanceKm(myPosition[0], myPosition[1], l.latitude, l.longitude);
+                                    if (dist <= 10) {
+                                      const cap = capsuleById[l.capsuleId];
+                                      if (cap) addOpenedCapsule(cap, 'Гео-капсула');
+                                      navigate(`/feed-capsule/${l.capsuleId}`);
+                                      return;
+                                    }
+                                    window.alert('Доступ запрещен. Вам нужно быть в радиусе 10 км от этой точки.');
+                                  }}
+                                >
+                                  Погрузиться
+                                </button>
+                              </>
+                            ) : (
+                              <div className={styles.popNoGps}>Включите GPS для доступа</div>
+                            )}
+                          </div>
                         </div>
                       </Popup>
                     </Marker>
