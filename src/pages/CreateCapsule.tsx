@@ -123,7 +123,7 @@ const CreateCapsule: React.FC = () => {
         ownerUserId: userId,
         contentType,
         title,
-        textContent: contentType === 0 ? textContent : null,
+        textContent: textContent || null,
         linkUrl: contentType === 1 ? linkUrl : null,
         fileStoragePath,
         openAtUtc,
@@ -266,38 +266,69 @@ const CreateCapsule: React.FC = () => {
                 )}
 
                 {contentType === 1 && (
-                  <div className={`${styles.controlGroup} ${styles.slideIn}`}>
-                    <label htmlFor="capsule-url" className={page.label}>URL ссылки</label>
-                    <input
-                      id="capsule-url"
-                      className={`${page.input} ${styles.aestheticInput}`}
-                      type="url"
-                      value={linkUrl}
-                      onChange={(e) => setLinkUrl(e.target.value)}
-                      required
-                      placeholder="https://..."
-                    />
-                  </div>
+                  <>
+                    <div className={`${styles.controlGroup} ${styles.slideIn}`}>
+                      <label htmlFor="capsule-url" className={page.label}>URL ссылки</label>
+                      <input
+                        id="capsule-url"
+                        className={`${page.input} ${styles.aestheticInput}`}
+                        type="url"
+                        value={linkUrl}
+                        onChange={(e) => setLinkUrl(e.target.value)}
+                        required
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div className={`${styles.controlGroup} ${styles.slideIn} ${styles.textOptional}`}>
+                      <label htmlFor="capsule-text-link" className={page.label}>Текст сообщения (опционально)</label>
+                      <textarea
+                        id="capsule-text-link"
+                        className={`${page.textarea} ${styles.aestheticInput} ${styles.aestheticTextarea}`}
+                        value={textContent}
+                        onChange={(e) => setTextContent(e.target.value)}
+                        placeholder="Напишите ваше послание здесь..."
+                      />
+                    </div>
+                  </>
                 )}
 
                 {contentType === 2 && (
                   <div className={`${styles.fileSection} ${styles.slideIn}`}>
+                    <div className={`${styles.controlGroup} ${styles.textOptional}`}>
+                      <label htmlFor="capsule-text-file" className={page.label}>Текст сообщения (опционально)</label>
+                      <textarea
+                        id="capsule-text-file"
+                        className={`${page.textarea} ${styles.aestheticInput} ${styles.aestheticTextarea}`}
+                        value={textContent}
+                        onChange={(e) => setTextContent(e.target.value)}
+                        placeholder="Напишите ваше послание здесь..."
+                      />
+                    </div>
                     <label className={page.label}>Прикрепленные файлы</label>
                     <div className={styles.fileDisplay}>
-                      {filePaths.map((path, index) => (
-                        <div key={`${path}-${index}`} className={styles.fileItem}>
-                          <span>📄</span> File {index + 1}: {path.split('/').pop()}
-                        </div>
-                      ))}
+                      {filePaths.map((path, index) => {
+                        const ext = path.split('.').pop()?.toLowerCase();
+                        const icon = !ext ? '📄' :
+                          /^(png|jpe?g|gif|webp|bmp|svg)$/.test(ext) ? '🖼️' :
+                          /^(mp4|webm|mov|avi|mkv|wmv|flv|m4v|3gp|ogv)$/.test(ext) ? '🎬' :
+                          /^(mp3|wav|ogg|flac|aac|m4a|wma|opus)$/.test(ext) ? '🎵' : '📄';
+                        return (
+                          <div key={`${path}-${index}`} className={styles.fileItem}>
+                            <span>{icon} {path.split('/').pop()}</span>
+                          </div>
+                        );
+                      })}
                       {filePaths.length === 0 && <p className={page.hint}>Файлы еще не выбраны</p>}
                     </div>
-                    <button
-                      type="button"
-                      className={`${layout.btnPrimaryLarge} ${styles.fileBtn}`}
-                      onClick={() => document.getElementById('capsule-file-upload')?.click()}
-                    >
-                      {filePaths.length === 0 ? 'Выбрать файл' : 'Добавить еще файл'}
-                    </button>
+                    <div className={styles.fileBtnWrap}>
+                      <button
+                        type="button"
+                        className={`${layout.btnPrimaryLarge} ${styles.fileBtn}`}
+                        onClick={() => document.getElementById('capsule-file-upload')?.click()}
+                      >
+                        {filePaths.length === 0 ? 'Выбрать файл' : 'Добавить еще файл'}
+                      </button>
+                    </div>
                     <input id="capsule-file-upload" type="file" style={{ display: 'none' }} onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) uploadFile(file, 'files').then(path => setFilePaths(prev => [...prev, path]));

@@ -170,6 +170,16 @@
   margin-bottom: 1.5rem; 
 }
 
+.textOptional {
+  gap: 0.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.fileBtnWrap {
+  text-align: center;
+}
+
 .fileItem {
   color: var(--ml-text-dim);
   background: var(--ml-surface);

@@ -81,16 +81,6 @@ function futureDate(daysAhead: number): string {
 
 export const mockCapsules: TimeCapsuleDto[] = [
   {
-    id: 1, ownerUserId: 1, ownerDisplayName: 'Демо пользователь',
-    contentType: 0, title: 'Добро пожаловать в ленту',
-    textContent: 'Это публичная капсула, уже открытая для всех.',
-    fileStoragePath: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500',
-    openAtUtc: pastDate(2), createdAtUtc: pastDate(30),
-    recipientEmail: 'demo@memorylane.com', isPublic: true,
-    previewText: 'Первая публичная капсула платформы',
-    openedAtUtc: pastDate(2), openedFrom: 'Публичная капсула',
-  },
-  {
     id: 2, ownerUserId: 1, ownerDisplayName: 'Демо пользователь',
     contentType: 0, title: 'Личное письмо будущему',
     textContent: 'Содержимое скрыто до даты открытия.',
@@ -123,15 +113,6 @@ export const mockCapsules: TimeCapsuleDto[] = [
     openAtUtc: futureDate(365), createdAtUtc: pastDate(180),
     recipientEmail: 'maria@example.com', isPublic: false,
     previewText: 'Мои цели на десятилетие',
-  },
-  {
-    id: 6, ownerUserId: 1, ownerDisplayName: 'Демо пользователь',
-    contentType: 0, title: 'Мечты о космосе',
-    textContent: 'Записка о полете на Марс. Я верю, что человечество скоро ступит на красную планету!',
-    openAtUtc: pastDate(20), createdAtUtc: pastDate(150),
-    recipientEmail: 'demo@memorylane.com', isPublic: true,
-    previewText: 'Записка о полете на Марс',
-    openedAtUtc: pastDate(20), openedFrom: 'Публичная капсула',
   },
   {
     id: 7, ownerUserId: 6, ownerDisplayName: 'Ирина',
@@ -182,7 +163,6 @@ export const mockCapsules: TimeCapsuleDto[] = [
 ];
 
 export const mockLocations: CapsuleLocationDto[] = [
-  { id: 1, capsuleId: 1, latitude: 48.8566, longitude: 2.3522, placeLabel: 'Париж — открой, когда будешь здесь' },
   { id: 2, capsuleId: 10, latitude: 55.7297, longitude: 37.6010, placeLabel: 'Парк Горького, Москва' },
   { id: 3, capsuleId: 11, latitude: 55.7385, longitude: 37.6115, placeLabel: 'Набережная Воробьёвых гор, Москва' },
 ];
@@ -297,7 +277,7 @@ function matchPath<T>(
   }
 
   if (pathname === '/api/timecapsule/getPublicFeed') {
-    return { data: mockCapsules.filter((c) => c.isPublic && new Date(c.openAtUtc).getTime() < Date.now()) as T, merge: 'concat' };
+    return { data: mockCapsules.filter((c) => c.isPublic && new Date(c.openAtUtc).getTime() < Date.now() && !c.title.includes('[Демо]')) as T, merge: 'concat' };
   }
 
   if (pathname === '/api/timecapsule/getAll' && !method) {

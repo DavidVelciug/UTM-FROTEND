@@ -29,6 +29,20 @@ export function resolveMediaUrl(value?: string | null, fallback = ''): string {
   return `/${src}`;
 }
 
+export function isVideoSource(value?: string | null): boolean {
+  if (!value) return false;
+  const src = value.trim().toLowerCase();
+  if (!src) return false;
+  return /\.(mp4|webm|mov|avi|mkv|wmv|flv|m4v|3gp|ogv)(\?.*)?$/i.test(src);
+}
+
+export function isAudioSource(value?: string | null): boolean {
+  if (!value) return false;
+  const src = value.trim().toLowerCase();
+  if (!src) return false;
+  return /\.(mp3|wav|ogg|flac|aac|m4a|wma|opus)(\?.*)?$/i.test(src);
+}
+
 export function isImageSource(value?: string | null): boolean {
   if (!value) return false;
   const src = value.trim().toLowerCase();

@@ -8,7 +8,7 @@ import spinner from '../styles/loading.module.css';
 import { fetchJson } from '../config/api';
 import type { ModerationReportDto, ResponceMsg, TimeCapsuleDto } from '../types/api';
 import { getFeedCounts, getFeedUserReaction, toggleFeedReaction } from '../auth/reactions';
-import { isImageSource, resolveMediaUrl, resolveUserAvatar } from '../utils/file';
+import { isImageSource, parseCapsuleStorage, resolveMediaUrl, resolveUserAvatar } from '../utils/file';
 import { getAvatarByUserId } from '../auth/avatar';
 import CapsuleContentPreview from '../components/CapsuleContentPreview';
 import { getCurrentUserEmail } from '../auth/session';
@@ -150,9 +150,26 @@ const PublicFeed: React.FC = () => {
                         {c.previewText || 'Внутри этой капсулы находится ценное воспоминание.'}
                       </p>
 
-                      {(c.contentType === 1 || c.contentType === 2) && <CapsuleContentPreview capsule={c} />}
+                      {c.contentType === 1 && <CapsuleContentPreview capsule={c} />}
+                      {c.contentType === 2 && (() => {
+                        const parsed = parseCapsuleStorage(c.fileStoragePath);
+                        const cover = parsed.cover;
+                        if (cover && isImageSource(cover)) {
+                          return (
+                            <div className={feed.messageAttachment}>
+                              <img
+                                src={resolveMediaUrl(cover, '/assets/default-capsule-cover.svg')}
+                                alt="preview"
+                                className={feed.attachImg}
+                                loading="lazy"
+                              />
+                            </div>
+                          );
+                        }
+                        return null;
+                      })()}
 
-                      {c.contentType === 0 && isImageSource(c.fileStoragePath) && (
+                      {(c.contentType === 0 || c.contentType === 1) && isImageSource(c.fileStoragePath) && (
                         <div className={feed.messageAttachment}>
                           <img
                             src={resolveMediaUrl(c.fileStoragePath, '/assets/default-capsule-cover.svg')}
@@ -162,6 +179,7 @@ const PublicFeed: React.FC = () => {
                           />
                         </div>
                       )}
+
                     </div>
 
                     <div className={feed.messageFooter}>

@@ -1,6 +1,6 @@
 import React from 'react';
 import type { TimeCapsuleDto } from '../types/api';
-import { isImageSource, parseCapsuleStorage, resolveMediaUrl } from '../utils/file';
+import { isAudioSource, isImageSource, isVideoSource, parseCapsuleStorage, resolveMediaUrl } from '../utils/file';
 import styles from '../styles/CapsuleContentPreview.module.css';
 
 type Props = { capsule: TimeCapsuleDto };
@@ -73,19 +73,21 @@ const CapsuleContentPreview: React.FC<Props> = ({ capsule: c }) => {
   }
 
   if (c.contentType === 2 && c.fileStoragePath) {
+    const raw = c.fileStoragePath.trim();
+
     const parsed = parseCapsuleStorage(c.fileStoragePath);
     const cover = parsed.cover;
-    const main = parsed.attachments[0] ?? '';
+    const main = parsed.attachments[0] ?? raw;
     const fileName = main.split(/[/\\]/).pop() || 'Вложение';
     const fileHref = resolveMediaUrl(main);
 
-    const imageCandidate = (cover && isImageSource(cover)) ? cover : main;
+    const items: React.ReactNode[] = [];
 
-    if (imageCandidate && isImageSource(imageCandidate)) {
-      return (
-        <div className={styles.previewFrame}>
+    if (cover && isImageSource(cover)) {
+      items.push(
+        <div className={styles.previewFrame} key="cover">
           <img
-            src={resolveMediaUrl(imageCandidate, '/assets/default-capsule-cover.svg')}
+            src={resolveMediaUrl(cover, '/assets/default-capsule-cover.svg')}
             alt=""
             className={styles.previewImg}
             onError={(e) => {
@@ -96,22 +98,60 @@ const CapsuleContentPreview: React.FC<Props> = ({ capsule: c }) => {
       );
     }
 
-    return (
-      <div className={styles.fileRichCard}>
-        <div className={styles.fileHero}>
-          <div className={styles.fileDocIcon}>
-            <DocGlyph />
+    if (main && isImageSource(main)) {
+      if (!cover || main !== cover) {
+        items.push(
+          <div className={styles.previewFrame} key="main">
+            <img
+              src={resolveMediaUrl(main, '/assets/default-capsule-cover.svg')}
+              alt=""
+              className={styles.previewImg}
+              onError={(e) => {
+                e.currentTarget.src = '/assets/default-capsule-cover.svg';
+              }}
+            />
+          </div>
+        );
+      }
+    } else if (main && isVideoSource(main)) {
+      items.push(
+        <div className={styles.previewFrame} key="main">
+          <video controls style={{ width: '100%', maxHeight: 420, display: 'block' }}>
+            <source src={resolveMediaUrl(main)} />
+          </video>
+        </div>
+      );
+    } else if (main && isAudioSource(main)) {
+      items.push(
+        <div className={styles.previewFrame} style={{ padding: '1.5rem' }} key="main">
+          <audio controls style={{ width: '100%', display: 'block' }}>
+            <source src={resolveMediaUrl(main)} />
+          </audio>
+        </div>
+      );
+    }
+
+    if (items.length === 0 && main) {
+      items.push(
+        <div className={styles.fileRichCard} key="main">
+          <div className={styles.fileHero}>
+            <div className={styles.fileDocIcon}>
+              <DocGlyph />
+            </div>
+          </div>
+          <div className={styles.fileMeta}>
+            <span className={styles.fileBadge}>Вложение</span>
+            <span className={styles.fileName}>{fileName}</span>
+            <a className={styles.downloadBtn} href={fileHref} download target="_blank" rel="noreferrer">
+              Скачать и открыть
+            </a>
           </div>
         </div>
-        <div className={styles.fileMeta}>
-          <span className={styles.fileBadge}>Вложение</span>
-          <span className={styles.fileName}>{fileName}</span>
-          <a className={styles.downloadBtn} href={fileHref} download target="_blank" rel="noreferrer">
-            Скачать и открыть
-          </a>
-        </div>
-      </div>
-    );
+      );
+    }
+
+    if (items.length > 0) return <>{items}</>;
+    return null;
   }
 
   return null;
