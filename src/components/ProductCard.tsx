@@ -50,12 +50,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
         />
       </div>
       <div className={styles.cardBody}>
-        <h3 className={styles.cardTitle}>Капсула: {name}</h3>
+        <h3 className={styles.cardTitle}>{name}</h3>
         <p className={styles.cardAuthor}>
           Автор: <span className={styles.authorName}>{creatorName || 'Пользователь'}</span> <span className={styles.authorStatus}>(Подтвержден)</span>
         </p>
         <span className={styles.priceBadge}>{price} MDL</span>
-        <p className={styles.cardDescription}>{description}</p>
+        <p className={styles.cardDescription}>
+          {likesCount + dislikesCount === 0
+            ? 'Нет оценок'
+            : `Качество: ${Math.round((likesCount / (likesCount + dislikesCount)) * 100)}%`}
+        </p>
         {openAtUtc && (
           <p className={styles.cardDate}>
             Дата открытия: {new Date(openAtUtc).toLocaleString('ru-RU')}

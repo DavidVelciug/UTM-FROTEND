@@ -116,6 +116,11 @@ const CreateCapsule: React.FC = () => {
         return;
       }
 
+      if (capsuleMode === 'catalog' && !coverImage) {
+        setStatus('Для каталога обязательно добавьте фото-превью.');
+        return;
+      }
+
       const openAtUtc = showOpenAt ? new Date(openAt).toISOString() : new Date().toISOString();
       const fileStoragePath = buildFileStoragePath();
       const body = {

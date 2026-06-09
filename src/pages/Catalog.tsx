@@ -121,7 +121,9 @@ const Catalog: React.FC = () => {
       setError('У этой позиции каталога нет связанной капсулы. Пересоздайте капсулу в режиме каталога.');
       return;
     }
-    navigate(`/capsule-view/${capsuleId}`);
+    const product = products.find((p) => p.capsuleId === capsuleId);
+    const price = product?.price ?? 0;
+    navigate(`/feed-capsule/${capsuleId}?price=${price}`);
   };
 
   return (
