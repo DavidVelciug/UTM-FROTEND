@@ -1,0 +1,81 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.body {
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  border-radius: 32px;
+  width: min(420px, 94vw);
+  box-shadow: var(--shadow-lg);
+}
+
+.title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.message {
+  color: var(--text-dim);
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 1.75rem;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancelBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.7rem 1.5rem;
+  border-radius: 14px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.cancelBtn:hover {
+  background: var(--surface);
+}
+
+.confirmBtn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.confirmBtn:hover {
+  filter: brightness(1.1);
+}
+
+.dangerBtn {
+  background: #ef4444;
+}
+
+.dangerBtn:hover {
+  background: #dc2626;
+}

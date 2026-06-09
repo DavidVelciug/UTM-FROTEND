@@ -199,7 +199,7 @@ const SentCapsules: React.FC = () => {
                                         setLockedCapsule(item);
                                         return;
                                       }
-                                      navigate(`/capsule-view/${item.id}`);
+                                      navigate(`/feed-capsule/${item.id}?source=sent`);
                                     }}
                                   >
                                     {locked ? 'Капсула запечатана' : 'Распаковать сейчас'}

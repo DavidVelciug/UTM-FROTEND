@@ -246,7 +246,7 @@ const PublicFeed: React.FC = () => {
                             <span className={feed.count}>{dislikes[c.id] ?? 0}</span>
                           </button>
                         </div>
-                        <Link to={`/feed-capsule/${c.id}`} className={feed.unpackBtn}>
+                        <Link to={`/feed-capsule/${c.id}?source=feed`} className={feed.unpackBtn}>
                           Распаковать
                         </Link>
                       </div>

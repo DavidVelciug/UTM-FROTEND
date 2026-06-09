@@ -5,7 +5,11 @@ import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/adminModeration.module.css';
 import { fetchJson } from '../config/api';
+import { getAvatar } from '../auth/avatar';
+import { getCurrentUserEmail } from '../auth/session';
+import { resolveMediaUrl } from '../utils/file';
 import type { ModerationReportDto, ProductDto, ResponceMsg, TimeCapsuleDto } from '../types/api';
+import ConfirmModal from '../components/ConfirmModal';
 
 const AdminModeration: React.FC = () => {
   const [capsules, setCapsules] = useState<TimeCapsuleDto[]>([]);
@@ -19,6 +23,7 @@ const AdminModeration: React.FC = () => {
   const [catalogPage, setCatalogPage] = useState(1);
   const pageSize = 12;
   const [tab, setTab] = useState<'reports' | 'public' | 'catalog'>('reports');
+  const [confirmAction, setConfirmAction] = useState<{ message: string; action: () => void } | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -49,14 +54,19 @@ const AdminModeration: React.FC = () => {
   const pagedCatalog = catalogItems.slice((catalogPage - 1) * pageSize, catalogPage * pageSize);
 
   const deleteCapsule = async (id: number) => {
-    if (!window.confirm('Удалить эту капсулу навсегда?')) return;
-    try {
-      const res = await fetchJson<ResponceMsg>(`/api/timecapsule/id?id=${id}`, { method: 'DELETE' });
-      setInfo(res.message);
-      await load();
-    } catch (e: unknown) {
-      setInfo(e instanceof Error ? e.message : 'Ошибка');
-    }
+    setConfirmAction({
+      message: 'Удалить эту капсулу навсегда?',
+      action: async () => {
+        setConfirmAction(null);
+        try {
+          const res = await fetchJson<ResponceMsg>(`/api/timecapsule/id?id=${id}`, { method: 'DELETE' });
+          setInfo(res.message);
+          await load();
+        } catch (e: unknown) {
+          setInfo(e instanceof Error ? e.message : 'Ошибка');
+        }
+      },
+    });
   };
 
   const updateReport = async (report: ModerationReportDto, status: number) => {
@@ -78,14 +88,19 @@ const AdminModeration: React.FC = () => {
   };
 
   const deleteCatalogItem = async (id: number) => {
-    if (!window.confirm('Удалить товар из каталога?')) return;
-    try {
-      const res = await fetchJson<ResponceMsg>(`/api/product/id?id=${id}`, { method: 'DELETE' });
-      setInfo(res.message);
-      await load();
-    } catch (e: unknown) {
-      setInfo(e instanceof Error ? e.message : 'Ошибка');
-    }
+    setConfirmAction({
+      message: 'Удалить товар из каталога?',
+      action: async () => {
+        setConfirmAction(null);
+        try {
+          const res = await fetchJson<ResponceMsg>(`/api/product/id?id=${id}`, { method: 'DELETE' });
+          setInfo(res.message);
+          await load();
+        } catch (e: unknown) {
+          setInfo(e instanceof Error ? e.message : 'Ошибка');
+        }
+      },
+    });
   };
 
   return (
@@ -129,9 +144,21 @@ const AdminModeration: React.FC = () => {
                       <p style={{minHeight: '60px', fontWeight: 500}}>{r.reason}</p>
                       <div className={styles.innerCard}>
                         <span className={styles.muted}>Капсула: <span style={{color: 'var(--ml-text-main)'}}>#{r.capsuleId}</span></span><br/>
-                        <span className={styles.muted}>Автор жалобы: <span style={{color: 'var(--ml-text-main)'}}>{r.reporterDisplayName || 'Аноним'}</span></span>
+                        <div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.75rem'}}>
+                          <img
+                            src={(() => {
+                              const currentEmail = getCurrentUserEmail();
+                              const isMe = r.reporterEmail && currentEmail && r.reporterEmail.toLowerCase() === currentEmail.toLowerCase();
+                              return isMe ? resolveMediaUrl(getAvatar(), '/assets/default-avatar.svg') : '/assets/default-avatar.svg';
+                            })()}
+                            alt=""
+                            className={styles.reporterAvatar}
+                            onError={(e) => { e.currentTarget.src = '/assets/default-avatar.svg'; }}
+                          />
+                          <span className={styles.muted}>Автор жалобы: <span style={{color: 'var(--ml-text-main)'}}>{r.reporterDisplayName || 'Аноним'}</span></span>
+                        </div>
                       </div>
-                      <div className={layout.row} style={{marginTop: '2rem', gap: '0.5rem'}}>
+                      <div style={{marginTop: '2rem', display: 'flex', gap: '0.75rem', flexWrap: 'wrap'}}>
                         <Link to={`/admin/moderation/review?capsuleId=${r.capsuleId}&reportId=${r.id}`} className={styles.actionBtn}>Обзор</Link>
                         <button className={styles.dangerBtn} onClick={() => void acceptReportAndBanPost(r)}>Бан</button>
                         <button className={styles.actionBtn} style={{background: 'rgba(255,255,255,0.05)', color: 'white'}} onClick={() => void updateReport(r, 2)}>Skip</button>
@@ -147,9 +174,12 @@ const AdminModeration: React.FC = () => {
                     <article key={c.id} className={styles.card}>
                       <span className={styles.idBadge}>CAPSULE #{c.id}</span>
                       <h3 style={{marginTop: '1rem'}}>{c.title || 'Untitled Archive'}</h3>
-                      <div className={layout.row} style={{marginTop: '2rem', justifyContent: 'space-between'}}>
+                      <div style={{marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem'}}>
                         <span className={styles.muted}>Публичный доступ</span>
-                        <button className={styles.dangerBtn} onClick={() => deleteCapsule(c.id)}>Удалить</button>
+                        <div style={{display: 'flex', gap: '0.5rem'}}>
+                          <Link to={`/feed-capsule/${c.id}?source=moderation`} className={styles.actionBtn}>Обзор</Link>
+                          <button className={styles.dangerBtn} onClick={() => deleteCapsule(c.id)}>Удалить</button>
+                        </div>
                       </div>
                     </article>
                   ))}
@@ -162,9 +192,14 @@ const AdminModeration: React.FC = () => {
                     <article key={item.id} className={styles.card}>
                       <span className={styles.idBadge}>PRODUCT #{item.id}</span>
                       <h3 style={{marginTop: '1rem'}}>{item.name}</h3>
-                      <div className={layout.row} style={{marginTop: '2rem', justifyContent: 'space-between'}}>
+                      <div style={{marginTop: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem'}}>
                         <span className={layout.textGradient}>{item.price} pts</span>
-                        <button className={styles.dangerBtn} onClick={() => void deleteCatalogItem(item.id)}>Убрать</button>
+                        <div style={{display: 'flex', gap: '0.5rem'}}>
+                          {item.capsuleId != null && (
+                            <Link to={`/feed-capsule/${item.capsuleId}?source=moderation`} className={styles.actionBtn}>Обзор</Link>
+                          )}
+                          <button className={styles.dangerBtn} onClick={() => void deleteCatalogItem(item.id)}>Убрать</button>
+                        </div>
                       </div>
                     </article>
                   ))}
@@ -188,6 +223,14 @@ const AdminModeration: React.FC = () => {
           )}
         </div>
       </main>
+      <ConfirmModal
+        open={!!confirmAction}
+        title="Подтверждение"
+        message={confirmAction?.message ?? ''}
+        danger
+        onConfirm={confirmAction?.action}
+        onCancel={() => setConfirmAction(null)}
+      />
       <Footer />
     </div>
   );

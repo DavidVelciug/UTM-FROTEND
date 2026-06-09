@@ -7,7 +7,13 @@ import styles from '../styles/openedCapsules.module.css';
 import { getOpenedCapsules, type OpenedCapsuleItem } from '../auth/capsuleStore';
 import { fetchJson } from '../config/api';
 import { getCurrentUserId } from '../auth/session';
-import type { TimeCapsuleDto } from '../types/api';
+import type { ProductDto } from '../types/api';
+
+const contentTypeLabels: Record<number, string> = {
+  0: 'Текстовая',
+  1: 'Ссылочная',
+  2: 'Файловая',
+};
 
 const normalizeOpenedFrom = (val: string | null | undefined): string | undefined => {
   if (!val) return undefined;
@@ -15,6 +21,7 @@ const normalizeOpenedFrom = (val: string | null | undefined): string | undefined
     'Лента': 'Публичная капсула',
     'Каталог': 'Капсула каталога',
     'Присланные капсулы': 'Присланная капсула',
+    'Моя капсула': 'Моя капсула',
   };
   return map[val] ?? val;
 };
@@ -41,21 +48,21 @@ const OpenedCapsules: React.FC = () => {
       return;
     }
     setLoading(true);
-    void fetchJson<TimeCapsuleDto[]>(`/api/timecapsule/getOpenedForUser?userId=${userId}`)
-      .then((serverCapsules) => {
-        const local = normalizeItems(getOpenedCapsules());
-        const merged = [...local];
-        serverCapsules.forEach((c) => {
-          if (!merged.some((x) => x.id === c.id)) {
-            const normalized = normalizeOpenedFrom(c.openedFrom);
-            merged.push({
-              ...c,
-              openedAtUtc: c.openedAtUtc ?? c.openAtUtc,
-              openedFrom: normalized ?? (c.ownerUserId === userId ? 'Моя капсула' : c.isPublic ? 'Публичная капсула' : 'Присланная капсула'),
-            });
+    Promise.all([
+      fetchJson<ProductDto[]>('/api/product/getAll').catch(() => [] as ProductDto[]),
+    ])
+      .then(([products]) => {
+        const catalogCapsuleIds = new Set(products.map((p) => p.capsuleId).filter((id): id is number => id != null));
+
+        let local = normalizeItems(getOpenedCapsules());
+        local = local.map((item) => {
+          if (item.openedFrom === 'Публичная капсула' && catalogCapsuleIds.has(item.id)) {
+            return { ...item, openedFrom: 'Капсула каталога' };
           }
+          return item;
         });
-        setItems(merged);
+
+        setItems(local);
       })
       .catch(() => setItems(normalizeItems(getOpenedCapsules())))
       .finally(() => setLoading(false));
@@ -186,7 +193,7 @@ const OpenedCapsules: React.FC = () => {
 
                               <div className={styles.cardContent}>
                                 <div className={styles.infoGroup}>
-                                  <p className={styles.hint}>Тип капсулы: <span>{item.isPublic ? 'Публичная' : 'Приватная'}</span></p>
+                                  <p className={styles.hint}>Тип капсулы: <span>{contentTypeLabels[item.contentType] ?? 'Неизвестный'}</span></p>
                                   <p className={styles.hint}>Дата открытия: <span>{new Date(item.openedAtUtc ?? item.openAtUtc).toLocaleDateString('ru-RU')}</span></p>
                                   <p className={styles.hint}>Источник: <span>{item.openedFrom ?? 'Неизвестно'}</span></p>
                                 </div>
@@ -194,7 +201,7 @@ const OpenedCapsules: React.FC = () => {
                             </div>
 
                             <div className={styles.cardActions}>
-                              <Link to={`/capsule-view/${item.id}`} className={styles.viewBtn}>
+                              <Link to={`/feed-capsule/${item.id}?source=opened${item.catalogPrice ? `&price=${item.catalogPrice}` : ''}`} className={styles.viewBtn}>
                                 Открыть содержимое
                               </Link>
                             </div>

@@ -11,25 +11,49 @@ import { addOpenedCapsule } from '../auth/capsuleStore';
 import { parseCapsuleStorage, isImageSource, isVideoSource, isAudioSource, resolveMediaUrl, resolveUserAvatar } from '../utils/file';
 import { getAvatarByUserId } from '../auth/avatar';
 
+function formatCountdown(target: Date, now: Date): string {
+  const diff = target.getTime() - now.getTime();
+  if (diff <= 0) return 'Можно открыть';
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const mins = Math.floor((diff / (1000 * 60)) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+  return `${days}д ${hours}ч ${mins}м ${secs}с`;
+}
+
+const sourceLabel: Record<string, string> = {
+  catalog: 'Капсула каталога',
+  feed: 'Публичная капсула',
+  sent: 'Присланная капсула',
+  map: 'Гео-капсула',
+};
+
 const FeedCapsuleView: React.FC = () => {
   const { capsuleId } = useParams<{ capsuleId: string }>();
   const [searchParams] = useSearchParams();
-  const fromCatalog = searchParams.has('price');
+  const source = searchParams.get('source') || (searchParams.has('price') ? 'catalog' : 'feed');
+  const hasPrice = searchParams.has('price');
   const catalogPrice = Number(searchParams.get('price')) || 0;
   const [capsule, setCapsule] = useState<TimeCapsuleDto | null>(null);
+  const [now, setNow] = useState(() => new Date());
   const userId = getCurrentUserId();
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
 
   useEffect(() => {
     if (!capsuleId || !userId) return;
     void fetchJson<TimeCapsuleDto>(`/api/timecapsule/idForUser?id=${capsuleId}&viewerUserId=${userId}`)
       .then((data) => {
         setCapsule(data);
-        if (!data.isLocked) {
-          addOpenedCapsule(data, 'Публичная капсула');
+        if (!data.isLocked && source !== 'opened') {
+          addOpenedCapsule(data, sourceLabel[source] ?? 'Публичная капсула', hasPrice ? catalogPrice : undefined);
         }
       })
       .catch(() => setCapsule(null));
-  }, [capsuleId, userId]);
+  }, [capsuleId, userId, source]);
 
   const avatarSrc =
     capsule ? getAvatarByUserId(capsule.ownerUserId) || resolveUserAvatar(capsule.ownerUserId, capsule.ownerDisplayName) : '';
@@ -63,7 +87,7 @@ const FeedCapsuleView: React.FC = () => {
                   </div>
                 </div>
                 <h1 className={detail.title}>{capsule.title}</h1>
-                {fromCatalog && (
+                {hasPrice && (
                   <div style={{ marginTop: 10, fontWeight: 800, fontSize: '1.3rem', color: '#fff', background: 'linear-gradient(135deg, #e57373, #c62828)', display: 'inline-block', padding: '6px 18px', borderRadius: 999 }}>
                     {catalogPrice} MDL
                   </div>
@@ -198,7 +222,7 @@ const FeedCapsuleView: React.FC = () => {
                 return items.length > 0 ? items : null;
               })()}
 
-              {!fromCatalog && (
+              {!hasPrice && (
                 <div className={detail.letterFooter}>
                   <p className={detail.bodyText} style={{ fontSize: '0.88rem', color: 'var(--text-dim)' }}>
                     Получатель: {capsule.recipientEmail}
@@ -206,6 +230,32 @@ const FeedCapsuleView: React.FC = () => {
                 </div>
               )}
             </article>
+          )}
+          {capsule?.isLocked && (
+            <div
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.6)',
+                display: 'grid',
+                placeItems: 'center',
+                zIndex: 1000,
+              }}
+            >
+              <div
+                style={{
+                  width: 'min(520px, 92vw)',
+                  background: 'var(--surface-light)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '24px',
+                  padding: '1.75rem',
+                }}
+              >
+                <h2>Ждите время</h2>
+                <p className={detail.bodyText}>Получатель не может открыть капсулу раньше указанного времени.</p>
+                <p className={detail.lockedBanner}>До открытия: {formatCountdown(new Date(capsule.openAtUtc), now)}</p>
+              </div>
+            </div>
           )}
         </div>
       </main>

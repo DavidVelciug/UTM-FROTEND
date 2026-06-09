@@ -131,6 +131,8 @@
   --ml-primary-rgb: 99, 102, 241;
   --ml-accent-rgb: 236, 72, 153;
   --ml-gradient-aesthetic: linear-gradient(135deg, #a855f7, #ec4899, #6366f1);
+  --ml-calendar-reg: #10b981;
+  --ml-calendar-cap: #6366f1;
 }
 
 :global(body.light-theme) {
@@ -146,6 +148,8 @@
   --ml-primary-rgb: 201, 168, 76;
   --ml-accent-rgb: 232, 168, 68;
   --ml-gradient-aesthetic: linear-gradient(135deg, #c9a84c, #e8c454, #d4a017);
+  --ml-calendar-reg: #16a34a;
+  --ml-calendar-cap: #c9a84c;
 }
 
 .pageWrapper {

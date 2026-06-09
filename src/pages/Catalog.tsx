@@ -123,7 +123,7 @@ const Catalog: React.FC = () => {
     }
     const product = products.find((p) => p.capsuleId === capsuleId);
     const price = product?.price ?? 0;
-    navigate(`/feed-capsule/${capsuleId}?price=${price}`);
+    navigate(`/feed-capsule/${capsuleId}?source=catalog&price=${price}`);
   };
 
   return (

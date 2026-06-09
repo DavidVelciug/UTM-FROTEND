@@ -4,6 +4,8 @@ import Footer from '../components/Footer';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/adminUsers.module.css';
 import { fetchJson } from '../config/api';
+import { getAvatarByUserId } from '../auth/avatar';
+import { resolveUserAvatar } from '../utils/file';
 import type { ResponceMsg, UserAccountDto } from '../types/api';
 
 type SortMode = 'newest' | 'oldest' | 'name-asc';
@@ -119,9 +121,15 @@ const AdminUsers: React.FC = () => {
             <div className={layout.fadeIn}>
               {pagedUsers.map((u) => (
                 <article key={u.id} className={styles.card}>
-                  <div className={styles.row} style={{ justifyContent: 'space-between' }}>
-                    <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
-                      <strong style={{fontSize: '1.1rem'}}>{u.displayName}</strong>
+                  <div className={styles.userRow}>
+                    <img
+                      className={styles.avatar}
+                      src={getAvatarByUserId(u.id) || resolveUserAvatar(u.id, u.displayName)}
+                      alt=""
+                      onError={(e) => { e.currentTarget.src = '/assets/default-avatar.svg'; }}
+                    />
+                    <div className={styles.userInfo}>
+                      <strong className={styles.userName}>{u.displayName}</strong>
                       <span className={styles.muted}>{u.email}</span>
                     </div>
                     <span className={styles.badge}>{u.role}</span>

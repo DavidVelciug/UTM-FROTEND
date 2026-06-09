@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import CapsuleContentPreview from '../components/CapsuleContentPreview';
 
 import layout from '../styles/layout.module.css';
-import page from '../styles/pageSection.module.css';
+import detail from '../styles/CapsuleDetail.module.css';
 import { fetchJson } from '../config/api';
 import type { ResponceMsg, TimeCapsuleDto } from '../types/api';
+import { parseCapsuleStorage, isImageSource, resolveMediaUrl } from '../utils/file';
 
 const ModerationCapsuleReview: React.FC = () => {
   const [params] = useSearchParams();
@@ -37,24 +39,85 @@ const ModerationCapsuleReview: React.FC = () => {
   return (
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-        <main className={layout.mainContent}>
-          <div className={`${page.section} ${layout.container}`}>
-            <article className={page.card}>
-              <h1>Проверка капсулы #{capsuleId}</h1>
-              {capsule && (
-                <>
-                  <h2>{capsule.title}</h2>
-                  <p className={page.muted}>{capsule.previewText || 'Превью'}</p>
-                </>
-              )}
-              <div className={page.row}>
-                <button type="button" className={layout.btnPrimary} onClick={() => void resolve(1)}>Удалить капсулу</button>
-                <button type="button" className={layout.btnPrimary} onClick={() => void resolve(2)}>Не удалять</button>
+      <main className={`${layout.mainContent} ${layout.fadeIn}`}>
+        <div className={layout.container} style={{ maxWidth: 800, margin: '2rem auto', padding: '0 5%' }}>
+          {!capsule && <div className={layout.textCenter}>Загрузка капсулы...</div>}
+          {capsule && (
+            <article className={detail.letterEnvelope}>
+              <div className={detail.letterHeader}>
+                <div className={detail.senderInfo}>
+                  <img
+                    src={'/assets/default-avatar.svg'}
+                    alt=""
+                    className={detail.avatarLarge}
+                    onError={(e) => { e.currentTarget.src = '/assets/default-avatar.svg'; }}
+                  />
+                  <div className={detail.senderMeta}>
+                    <span className={detail.author}>{capsule.ownerDisplayName || 'Аноним'}</span>
+                    <span className={detail.createdAt}>
+                      {new Date(capsule.createdAtUtc).toLocaleString('ru-RU', { dateStyle: 'medium', timeStyle: 'short' })}
+                    </span>
+                  </div>
+                </div>
+                <h1 className={detail.title}>{capsule.title}</h1>
               </div>
-              {msg && <p className={page.muted}>{msg}</p>}
+
+              <div className={detail.letterBody}>
+                {capsule.previewText && <p className={detail.bodyText}>{capsule.previewText}</p>}
+
+                {capsule.textContent && <p className={detail.bodyText}>{capsule.textContent}</p>}
+
+                {(capsule.contentType === 1 || capsule.contentType === 2) && (
+                  <div className={detail.previewSlot}>
+                    <CapsuleContentPreview capsule={capsule} />
+                  </div>
+                )}
+
+                {capsule.contentType === 0 && capsule.fileStoragePath && isImageSource(capsule.fileStoragePath) && (
+                  <div className={detail.previewSlot}>
+                    <img
+                      src={resolveMediaUrl(capsule.fileStoragePath, '/assets/default-capsule-cover.svg')}
+                      alt=""
+                      onError={(e) => { e.currentTarget.src = '/assets/default-capsule-cover.svg'; }}
+                    />
+                  </div>
+                )}
+
+                {capsule.linkUrl && capsule.contentType !== 1 && (
+                  <p className={detail.bodyText}>
+                    <a href={capsule.linkUrl} target="_blank" rel="noreferrer">{capsule.linkUrl}</a>
+                  </p>
+                )}
+
+                {(() => {
+                  const attachments = parseCapsuleStorage(capsule.fileStoragePath).attachments;
+                  if (attachments.length > 0 && capsule.contentType !== 2) {
+                    return (
+                      <div className={detail.attachRow}>
+                        {attachments.map((path, i) => (
+                          <a key={`${path}-${i}`} href={resolveMediaUrl(path)} download className={layout.btnPrimary}>
+                            Файл {i + 1}
+                          </a>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
+
+              <div className={detail.letterFooter} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <button type="button" className={layout.btnPrimaryLarge} onClick={() => void resolve(1)} style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)' }}>Удалить капсулу</button>
+                  <button type="button" className={layout.btnPrimaryLarge} onClick={() => void resolve(2)}>Оставить</button>
+                  <Link to="/admin/moderation" className={layout.btnPrimaryLarge}>Назад</Link>
+                </div>
+                {msg && <p style={{ color: 'var(--ml-text-dim)', margin: 0, fontSize: '0.9rem' }}>{msg}</p>}
+              </div>
             </article>
-          </div>
-        </main>
+          )}
+        </div>
+      </main>
       <Footer />
     </div>
   );

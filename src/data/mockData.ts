@@ -98,47 +98,58 @@ export const mockCapsules: TimeCapsuleDto[] = [
     openedAtUtc: pastDate(2), openedFrom: 'Публичная капсула',
   },
   {
-    id: 4, ownerUserId: 5, ownerDisplayName: 'Алексей',
+    id: 4, ownerUserId: 3, ownerDisplayName: 'Главный админ',
     contentType: 0, title: 'Послание потомкам',
     textContent: 'Как мы жили в 2024 году. Записываю свои мысли, чтобы через много лет вспомнить, каким был этот удивительный год.',
     openAtUtc: pastDate(10), createdAtUtc: pastDate(200),
-    recipientEmail: 'alex@example.com', isPublic: true,
+    recipientEmail: 'admin.one@memorylane.com', isPublic: false,
     previewText: 'Как мы жили в 2024 году',
     openedAtUtc: pastDate(10), openedFrom: 'Капсула каталога',
   },
   {
-    id: 5, ownerUserId: 2, ownerDisplayName: 'Мария',
+    id: 5, ownerUserId: 3, ownerDisplayName: 'Главный админ',
     contentType: 0, title: 'Письмо в 2030 год',
-    textContent: 'Мои цели на десятилетие. Надеюсь, к 2030 году я смогу осуществить все задуманное!',
-    openAtUtc: futureDate(365), createdAtUtc: pastDate(180),
-    recipientEmail: 'maria@example.com', isPublic: false,
+    textContent: 'Мои цели на десятилетие:\n\n1. Научиться играть на гитаре\n2. Посетить не менее 10 стран\n3. Написать книгу\n4. Выучить испанский язык\n5. Пробежать марафон\n\nНадеюсь, к 2030 году я смогу осуществить всё задуманное! Если ты читаешь это — напомни мне, что я обещал себе это.',
+    openAtUtc: pastDate(10), createdAtUtc: pastDate(180),
+    recipientEmail: 'admin.one@memorylane.com', isPublic: false,
     previewText: 'Мои цели на десятилетие',
+    openedAtUtc: pastDate(10), openedFrom: 'Капсула каталога',
   },
   {
-    id: 7, ownerUserId: 6, ownerDisplayName: 'Ирина',
-    contentType: 2, title: 'Секретный рецепт',
-    fileStoragePath: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=500',
-    openAtUtc: futureDate(60), createdAtUtc: pastDate(100),
-    recipientEmail: 'irina@example.com', isPublic: false,
+    id: 6, ownerUserId: 3, ownerDisplayName: 'Главный админ',
+    contentType: 0, title: 'Мечты о космосе',
+    textContent: 'Когда-нибудь человество обязательно полетит на Марс. Я мечтаю увидеть этот момент своими глазами. Представляю, как стою на красной планете и смотрю на Землю в иллюминатор. До встречи на Марсе!',
+    openAtUtc: pastDate(15), createdAtUtc: pastDate(90),
+    recipientEmail: 'admin.one@memorylane.com', isPublic: false,
+    previewText: 'Записка о полете на Марс',
+    openedAtUtc: pastDate(15), openedFrom: 'Капсула каталога',
+  },
+  {
+    id: 7, ownerUserId: 3, ownerDisplayName: 'Главный админ',
+    contentType: 0, title: 'Секретный рецепт',
+    textContent: 'Бабушкин пирог с яблоками:\n\nТесто:\n- Мука 300г\n- Масло сливочное 150г\n- Сахар 100г\n- Яйцо 1шт\n- Щепотка соли\n\nНачинка:\n- Яблоки 4шт\n- Корица 1ч.л.\n- Сахар 2ст.л.\n\nВыпекать 40 минут при 180°C.\n\nСекретный ингредиент — любовь!',
+    openAtUtc: pastDate(20), createdAtUtc: pastDate(365),
+    recipientEmail: 'admin.one@memorylane.com', isPublic: false,
     previewText: 'Бабушкин пирог',
+    openedAtUtc: pastDate(20), openedFrom: 'Капсула каталога',
   },
   {
-    id: 8, ownerUserId: 7, ownerDisplayName: 'Никита',
+    id: 8, ownerUserId: 3, ownerDisplayName: 'Главный админ',
     contentType: 0, title: 'Капсула времени 2024',
-    textContent: 'События этого года. 2024 год был насыщенным — много перемен, открытий и важных моментов.',
-    openAtUtc: pastDate(5), createdAtUtc: pastDate(30),
-    recipientEmail: 'nikita@example.com', isPublic: true,
+    textContent: 'События 2024 года, которые нельзя забыть:\n\n- Технологический бум: ИИ проник во все сферы жизни\n- Космические миссии: новые открытия на Луне и Марсе\n- Спортивные рекорды: невероятные достижения на Олимпиаде\n- Культурные события: фильмы, музыка и искусство, которые объединили миллионы\n\nЭтот год навсегда останется в наших сердцах.',
+    openAtUtc: pastDate(5), createdAtUtc: pastDate(45),
+    recipientEmail: 'admin.one@memorylane.com', isPublic: true,
     previewText: 'События этого года',
-    openedAtUtc: pastDate(5), openedFrom: 'Публичная капсула',
+    openedAtUtc: pastDate(5), openedFrom: 'Капсула каталога',
   },
   {
-    id: 9, ownerUserId: 8, ownerDisplayName: 'София',
+    id: 9, ownerUserId: 3, ownerDisplayName: 'Главный админ',
     contentType: 0, title: 'Путешествие в будущее',
-    textContent: 'Маршрут моей мечты: Япония, Новая Зеландия, Исландия и конечно же Марс!',
-    openAtUtc: pastDate(3), createdAtUtc: pastDate(60),
-    recipientEmail: 'sofia@example.com', isPublic: true,
+    textContent: 'Маршрут моей мечты:\n\nДень 1-3: Токио, Япония\nДень 4-6: Киото, Япония\nДень 7-10: Бангкок, Таиланд\nДень 11-14: Бали, Индонезия\nДень 15-18: Сидней, Австралия\nДень 19-21: Новая Зеландия\n\nОднажды я обязательно отправлюсь в это путешествие!',
+    openAtUtc: pastDate(3), createdAtUtc: pastDate(120),
+    recipientEmail: 'admin.one@memorylane.com', isPublic: false,
     previewText: 'Маршрут моей мечты',
-    openedAtUtc: pastDate(3), openedFrom: 'Публичная капсула',
+    openedAtUtc: pastDate(3), openedFrom: 'Капсула каталога',
   },
   {
     id: 10, ownerUserId: 1, ownerDisplayName: 'Демо пользователь',
@@ -180,15 +191,16 @@ export const mockReports: ModerationReportDto[] = [
   { id: 1, capsuleId: 3, reporterEmail: 'moderator@memorylane.com', reporterDisplayName: null, reason: 'Подозрение на спам в публичной ленте', status: 0, createdAtUtc: pastDate(1) },
 ];
 
+function genLastDays(n: number, counts: number[]): { date: string; count: number }[] {
+  return Array.from({ length: n }, (_, i) => ({
+    date: pastDate(n - 1 - i).split('T')[0],
+    count: counts[i % counts.length],
+  })).reverse();
+}
+
 export const mockStats: AdminStatsDto = {
-  userRegistrationsByDay: Array.from({ length: 14 }, (_, i) => ({
-    date: pastDate(13 - i).split('T')[0],
-    count: Math.floor(Math.random() * 5) + 1,
-  })),
-  capsulesCreatedByDay: Array.from({ length: 14 }, (_, i) => ({
-    date: pastDate(13 - i).split('T')[0],
-    count: Math.floor(Math.random() * 4) + 1,
-  })),
+  userRegistrationsByDay: genLastDays(21, [0, 1, 0, 2, 0, 0, 1, 0, 3, 0, 0, 1, 0, 0, 2, 0, 1, 0, 0, 0, 1]),
+  capsulesCreatedByDay: genLastDays(21, [1, 0, 0, 2, 0, 1, 0, 3, 0, 0, 1, 0, 0, 2, 0, 0, 1, 0, 2, 0, 0]),
 };
 
 interface MockEntry<T> {
@@ -280,6 +292,24 @@ function matchPath<T>(
     return { data: mockCapsules.filter((c) => c.isPublic && new Date(c.openAtUtc).getTime() < Date.now() && !c.title.includes('[Демо]')) as T, merge: 'concat' };
   }
 
+  if (pathname === '/api/timecapsule/idForUser') {
+    const id = Number(params['id'] ?? 0);
+    const viewerId = Number(params['viewerUserId'] ?? 0);
+    const capsule = mockCapsules.find((c) => c.id === id);
+    if (!capsule) return { data: undefined as T, merge: 'skip' };
+
+    const viewer = mockUsers.find((u) => u.id === viewerId);
+    if (!viewer) return { data: undefined as T, merge: 'skip' };
+
+    const isOwner = capsule.ownerUserId === viewerId;
+    const isRecipient = capsule.recipientEmail?.toLowerCase() === viewer.email?.toLowerCase();
+    const isCatalogCapsule = mockProducts.some((p) => p.capsuleId === id);
+    const canView = isOwner || capsule.isPublic || isRecipient || isCatalogCapsule;
+    if (!canView) return { data: undefined as T, merge: 'skip' };
+
+    return { data: capsule as T, merge: 'concat' };
+  }
+
   if (pathname === '/api/timecapsule/getAll' && !method) {
     return { data: mockCapsules as T, merge: 'concat' };
   }
@@ -308,6 +338,10 @@ function matchPath<T>(
     return { data: { isSuccess: true, message: 'Категория добавлена' } as T, merge: 'skip' };
   }
 
+  if (pathname.startsWith('/api/category/') && isMutation) {
+    return { data: { isSuccess: true, message: 'Категория обработана' } as T, merge: 'skip' };
+  }
+
   if (pathname === '/api/moderationreport/getAll') {
     return { data: mockReports as T, merge: 'concat' };
   }
@@ -317,7 +351,7 @@ function matchPath<T>(
   }
 
   if (pathname === '/api/admin/stats/getAnalytics') {
-    return { data: mockStats as T, merge: 'replace' };
+    return { data: mockStats as T, merge: 'concat' };
   }
 
   if (pathname === '/api/user/refresh' && method === 'POST') {

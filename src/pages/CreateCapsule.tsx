@@ -64,7 +64,7 @@ const CreateCapsule: React.FC = () => {
   const showOpenAt = capsuleMode !== 'catalog';
   const showRecipient = capsuleMode === 'personal';
   const showPreviewUpload = true;
-  const showLocationOptions = capsuleMode === 'location' || capsuleMode === 'personal';
+  const showLocationOptions = capsuleMode === 'location';
 
   useEffect(() => {
     setUseLocation(capsuleMode === 'location');
@@ -297,9 +297,9 @@ const CreateCapsule: React.FC = () => {
                   </>
                 )}
 
-                {contentType === 2 && (
+                  {contentType === 2 && (
                   <div className={`${styles.fileSection} ${styles.slideIn}`}>
-                    <div className={`${styles.controlGroup} ${styles.textOptional}`}>
+                    <div className={`${styles.controlGroup} ${styles.textOptional}`} style={{ marginTop: 0 }}>
                       <label htmlFor="capsule-text-file" className={page.label}>Текст сообщения (опционально)</label>
                       <textarea
                         id="capsule-text-file"
