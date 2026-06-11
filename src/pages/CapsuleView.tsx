@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CapsuleContentPreview from '../components/CapsuleContentPreview';
+import LockedCapsuleModal from '../components/capsule/LockedCapsuleModal';
 import layout from '../styles/layout.module.css';
 import detail from '../styles/CapsuleDetail.module.css';
 import { fetchJson } from '../config/api';
@@ -11,18 +12,10 @@ import { getCurrentUserId } from '../auth/session';
 import { addOpenedCapsule } from '../auth/capsuleStore';
 import { extractAttachmentPaths, isImageSource, resolveMediaUrl, resolveUserAvatar } from '../utils/file';
 import { getAvatarByUserId } from '../auth/avatar';
-
-function formatCountdown(target: Date, now: Date): string {
-  const diff = target.getTime() - now.getTime();
-  if (diff <= 0) return 'Можно открыть';
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const mins = Math.floor((diff / (1000 * 60)) % 60);
-  const secs = Math.floor((diff / 1000) % 60);
-  return `${days}д ${hours}ч ${mins}м ${secs}с`;
-}
+import { useInView } from '../hooks/useInView';
 
 const CapsuleView: React.FC = () => {
+  const { ref: mainRef, inView: mainInView } = useInView<HTMLDivElement>(0.15);
   const { capsuleId } = useParams<{ capsuleId: string }>();
   const userId = getCurrentUserId();
   const [capsule, setCapsule] = useState<TimeCapsuleDto | null>(null);
@@ -51,7 +44,7 @@ const CapsuleView: React.FC = () => {
   return (
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-        <main className={`${layout.mainContent} ${layout.fadeIn}`}>
+        <main ref={mainRef} className={`${layout.mainContent} ${layout.fadeInUp} ${mainInView ? layout.fadeInUpVisible : ''}`}>
         <div className={`${layout.container} ${detail.wrap}`}>
           {!capsule && <div className={layout.container}>Капсула не найдена.</div>}
           {capsule && (
@@ -139,32 +132,7 @@ const CapsuleView: React.FC = () => {
               </div>
             </article>
           )}
-          {capsule?.isLocked && (
-            <div
-              style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.6)',
-                display: 'grid',
-                placeItems: 'center',
-                zIndex: 1000,
-              }}
-            >
-              <div
-                style={{
-                  width: 'min(520px, 92vw)',
-                  background: 'var(--surface-light)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '24px',
-                  padding: '1.75rem',
-                }}
-              >
-                <h2>Ждите время</h2>
-                <p className={detail.bodyText}>Получатель не может открыть капсулу раньше указанного времени.</p>
-                <p className={detail.lockedBanner}>До открытия: {formatCountdown(new Date(capsule.openAtUtc), now)}</p>
-              </div>
-            </div>
-          )}
+          {capsule?.isLocked && <LockedCapsuleModal openAtUtc={capsule.openAtUtc} now={now} />}
         </div>
       </main>
       <Footer />

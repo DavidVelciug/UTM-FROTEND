@@ -8,8 +8,10 @@ import styles from '../styles/Auth.module.css';
 import { persistAuthFromLogin, setRole, type AppRole } from '../auth/session';
 import { fetchJson } from '../config/api';
 import type { UserAccountDto, UserLoginResultDto } from '../types/api';
+import { useInView } from '../hooks/useInView';
 
 export const LoginPage: React.FC = () => {
+  const { ref: cardRef, inView: cardInView } = useInView<HTMLDivElement>(0.2);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -44,9 +46,9 @@ export const LoginPage: React.FC = () => {
   return (
     <div className={layout.pageWrapper}>
       <Header />
-        <main className={layout.mainContent}>
+        <main className={layout.mainContent} style={{ display: 'flex', flexDirection: 'column' }}>
           <div className={styles.authPage}>
-            <div className={styles.authCard}>
+            <div ref={cardRef} className={`${styles.authCard} ${layout.fadeInUp} ${cardInView ? layout.fadeInUpVisible : ''}`}>
               <h2>С возвращением</h2>
               <p>Войдите, чтобы управлять своими капсулами</p>
 
@@ -71,10 +73,6 @@ export const LoginPage: React.FC = () => {
               </form>
               {error && <p className={styles.authNote}>{error}</p>}
 
-              <Link to="#" className={styles.forgotLink}>
-                Забыли пароль?
-              </Link>
-
               <p className={styles.authNote}>
                 Нет аккаунта? <Link to="/register">Зарегистрироваться</Link>
               </p>
@@ -87,6 +85,7 @@ export const LoginPage: React.FC = () => {
 };
 
 export const RegisterPage: React.FC = () => {
+  const { ref: cardRef, inView: cardInView } = useInView<HTMLDivElement>(0.2);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -131,9 +130,9 @@ export const RegisterPage: React.FC = () => {
   return (
     <div className={layout.pageWrapper}>
       <Header />
-        <main className={layout.mainContent}>
+        <main className={layout.mainContent} style={{ display: 'flex', flexDirection: 'column' }}>
           <div className={styles.authPage}>
-            <div className={styles.authCard}>
+            <div ref={cardRef} className={`${styles.authCard} ${layout.fadeInUp} ${cardInView ? layout.fadeInUpVisible : ''}`}>
               <h2>Регистрация</h2>
               <p>Присоединяйтесь к хранилищу воспоминаний</p>
 

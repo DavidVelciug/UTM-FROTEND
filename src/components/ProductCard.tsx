@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from '../styles/ProductCard.module.css';
 import { resolveMediaUrl } from '../utils/file';
+import { useInView } from '../hooks/useInView';
 
 interface ProductCardProps {
   id: number;
@@ -36,9 +37,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
   onOpen,
 }) => {
   const [opened, setOpened] = useState<boolean>(false);
+  const { ref, inView } = useInView<HTMLDivElement>(0.15);
 
   return (
-    <div className={styles.productCard}>
+    <div ref={ref} className={`${styles.productCard} ${styles.fadeInUp} ${inView ? styles.fadeInUpVisible : ''}`}>
       <div className={styles.cardImageWrap}>
         <img
           src={resolveMediaUrl(image, '/assets/default-capsule-cover.svg')}

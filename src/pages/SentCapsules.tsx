@@ -3,22 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CapsuleContentPreview from '../components/CapsuleContentPreview';
+import Pagination from '../components/common/Pagination';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/sentCapsules.module.css';
 import { fetchJson } from '../config/api';
 import { getCurrentUserId } from '../auth/session';
 import { resolveMediaUrl } from '../utils/file';
+import { formatCountdown } from '../utils/date';
 import type { TimeCapsuleDto } from '../types/api';
-
-function formatCountdown(target: Date, now: Date): string {
-  const diff = target.getTime() - now.getTime();
-  if (diff <= 0) return 'Можно открыть';
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const mins = Math.floor((diff / (1000 * 60)) % 60);
-  const secs = Math.floor((diff / 1000) % 60);
-  return `${days}д ${hours}ч ${mins}м ${secs}с`;
-}
+import { useInView } from '../hooks/useInView';
 
 const contentTypeLabels: Record<number, string> = {
   0: 'Текстовое содержимое',
@@ -27,6 +20,8 @@ const contentTypeLabels: Record<number, string> = {
 };
 
 const SentCapsules: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: sectionRef, inView: sectionInView } = useInView<HTMLDivElement>(0.15);
   const navigate = useNavigate();
   const userId = getCurrentUserId();
   const [items, setItems] = useState<TimeCapsuleDto[]>([]);
@@ -101,12 +96,12 @@ const SentCapsules: React.FC = () => {
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
       <main className={layout.mainContent}>
-        <div className={styles.pageHeader}>
-          <h1 className={layout.fadeIn}>Присланные капсулы</h1>
-          <p className={layout.fadeIn}>Послания из прошлого, отправленные специально для вас. Дождитесь нужного момента, чтобы раскрыть их тайны.</p>
+        <div ref={headerRef} className={`${styles.pageHeader} ${layout.fadeInUp} ${headerInView ? layout.fadeInUpVisible : ''}`}>
+          <h1>Присланные капсулы</h1>
+          <p>Послания из прошлого, отправленные специально для вас. Дождитесь нужного момента, чтобы раскрыть их тайны.</p>
         </div>
 
-        <div className={`${styles.section} ${layout.container}`}>
+        <div ref={sectionRef} className={`${styles.section} ${layout.container} ${layout.fadeInUp} ${sectionInView ? layout.fadeInUpVisible : ''}`}>
           {loading && (
             <div className={styles.loadingState}>
               <div className={styles.loader} />
@@ -164,7 +159,7 @@ const SentCapsules: React.FC = () => {
                     </div>
                   ) : (
                     <>
-                      <div className={`${styles.grid} ${layout.fadeIn}`}>
+                      <div className={styles.grid}>
                         {visible.map((item) => {
                           const openAt = new Date(item.openAtUtc);
                           const locked = openAt.getTime() > now.getTime();
@@ -232,33 +227,7 @@ const SentCapsules: React.FC = () => {
                         })}
                       </div>
 
-                      {filteredAndSorted.length > pageSize && (
-                        <div className={styles.pagination}>
-                          <button
-                            type="button"
-                            className={layout.btnPrimary}
-                            disabled={pageIndex <= 1}
-                            onClick={() => {
-                              setPageIndex((p) => p - 1);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                          >
-                            Назад
-                          </button>
-                          <span className={styles.pageNumber}>{pageIndex} / {totalPages}</span>
-                          <button
-                            type="button"
-                            className={layout.btnPrimary}
-                            disabled={pageIndex >= totalPages}
-                            onClick={() => {
-                              setPageIndex((p) => p + 1);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                          >
-                            Вперед
-                          </button>
-                        </div>
-                      )}
+                      {filteredAndSorted.length > pageSize && <Pagination page={pageIndex} totalPages={totalPages} onPageChange={(p) => { setPageIndex(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />}
                     </>
                   )}
                 </>

@@ -4,23 +4,27 @@ import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import SearchBar from '../components/filters/SearchBar';
 import ProductList from '../components/catalog/ProductList';
-import { Product } from '../data/products';
+import Pagination from '../components/common/Pagination';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/Catalog.module.css';
 import spinner from '../styles/loading.module.css';
 import { fetchJson } from '../config/api';
 import type { CategoryDto, ProductDto } from '../types/api';
 import { getCatalogCounts, getCatalogUserReaction, toggleCatalogReaction } from '../auth/reactions';
+import { useInView } from '../hooks/useInView';
 
 const TABS = ['Все', 'Личное', 'Мечты', 'Публичное', 'Прошлое'];
 
 const Catalog: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: controlsRef, inView: controlsInView } = useInView<HTMLDivElement>(0.2);
+
   const [search, setSearch] = useState<string>('');
   const [filter, setFilter] = useState<string>('Все');
   const [sortByPrice, setSortByPrice] = useState<'asc' | 'desc'>('asc');
   const [sortByNewest, setSortByNewest] = useState<'all' | 'newest'>('all');
   const [page, setPage] = useState(1);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [likesMap, setLikesMap] = useState<Record<number, number>>({});
@@ -29,7 +33,7 @@ const Catalog: React.FC = () => {
   const navigate = useNavigate();
   const pageSize = 8;
 
-  const refreshReactions = (items: Product[]) => {
+  const refreshReactions = (items: ProductDto[]) => {
     const likes: Record<number, number> = {};
     const dislikes: Record<number, number> = {};
     const user: Record<number, 'like' | 'dislike' | null> = {};
@@ -54,16 +58,14 @@ const Catalog: React.FC = () => {
           fetchJson<CategoryDto[]>('/api/category/getAll'),
         ]);
         const catMap = new Map<number, string>(cats.map((c) => [c.id, c.name]));
-        const mapped: Product[] = data.map((p) => ({
-          id: p.id,
-          capsuleId: p.capsuleId ?? null,
-          name: p.name,
+        const mapped: ProductDto[] = data.map((p) => ({
+          ...p,
           price: Number(p.price),
           category: p.category || (catMap.get(p.categoryId) ?? 'Без категории'),
           image: p.image || '/assets/default-capsule-cover.svg',
           description: p.description || 'Без описания',
-          creatorName: 'Пользователь',
-          creatorEmail: 'hidden@memorylane.local',
+          creatorName: p.creatorName || 'Пользователь',
+          creatorEmail: p.creatorEmail || 'hidden@memorylane.local',
         }));
         setProducts(mapped);
         refreshReactions(mapped);
@@ -130,13 +132,13 @@ const Catalog: React.FC = () => {
     <div className={`${layout.pageWrapper} ${styles.catalogPage} ${layout.withBg}`}>
       <Header />
         <main className={layout.mainContent}>
-          <div className={styles.catalogHeaderSection}>
+          <div ref={headerRef} className={`${styles.catalogHeaderSection} ${styles.fadeInUp} ${headerInView ? styles.fadeInUpVisible : ''}`}>
             <h1>Архив воспоминаний</h1>
             <p>Исследуйте капсулы времени, созданные другими людьми</p>
           </div>
 
           <div className={layout.container}>
-            <div className={styles.catalogControls}>
+            <div ref={controlsRef} className={`${styles.catalogControls} ${styles.fadeInUp} ${styles.delay100} ${controlsInView ? styles.fadeInUpVisible : ''}`}>
               <SearchBar value={search} onChange={setSearch} />
 
               <div className={styles.tabGroup}>
@@ -213,25 +215,7 @@ const Catalog: React.FC = () => {
                   onDislike={handleDislike}
                   onOpen={handleOpen}
                 />
-                <div className={styles.pagination}>
-                  <button
-                    type="button"
-                    className={styles.paginationBtn}
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  >
-                    Назад
-                  </button>
-                  <span className={styles.pageIndicator}>{page} / {totalPages}</span>
-                  <button
-                    type="button"
-                    className={styles.paginationBtn}
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  >
-                    Вперёд
-                  </button>
-                </div>
+                <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
               </>
             )}
 

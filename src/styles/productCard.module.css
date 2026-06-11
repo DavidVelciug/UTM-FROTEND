@@ -5,6 +5,23 @@
   margin: 2rem 0;
 }
 
+.fadeInUp {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.fadeInUpVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.delay100 { transition-delay: 0.1s; }
+.delay200 { transition-delay: 0.2s; }
+.delay300 { transition-delay: 0.3s; }
+.delay400 { transition-delay: 0.4s; }
+
 .productCard {
   background: var(--surface-light);
   border-radius: 24px;

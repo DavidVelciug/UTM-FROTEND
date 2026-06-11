@@ -1,23 +1,20 @@
+import { fetchJson } from '../config/api';
 import { getCurrentUserId } from './session';
-
-const catalogReactionsKey = 'memorylane-catalog-reactions';
-const feedReactionsKey = 'memorylane-feed-reactions';
+import type { ResponceMsg } from '../types/api';
 
 type Reaction = 'like' | 'dislike';
+
+const CATALOG_KEY = 'memorylane-catalog-reactions';
+const FEED_KEY = 'memorylane-feed-reactions';
+
 type ReactionsByUser = Record<string, Record<number, Reaction>>;
 
-function readMap(storageKey: string): ReactionsByUser {
-  const raw = localStorage.getItem(storageKey);
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw) as ReactionsByUser;
-  } catch {
-    return {};
-  }
+function readMap(key: string): ReactionsByUser {
+  try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch { return {}; }
 }
 
-function writeMap(storageKey: string, value: ReactionsByUser): void {
-  localStorage.setItem(storageKey, JSON.stringify(value));
+function writeMap(key: string, map: ReactionsByUser): void {
+  localStorage.setItem(key, JSON.stringify(map));
 }
 
 function getUserKey(): string {
@@ -25,64 +22,75 @@ function getUserKey(): string {
 }
 
 export function toggleCatalogReaction(productId: number, reaction: Reaction): Reaction | null {
-  const map = readMap(catalogReactionsKey);
+  const map = readMap(CATALOG_KEY);
   const userKey = getUserKey();
-  const current = map[userKey]?.[productId] ?? null;
-
   if (!map[userKey]) map[userKey] = {};
-  if (current === reaction) {
+  if (map[userKey][productId] === reaction) {
     delete map[userKey][productId];
   } else {
     map[userKey][productId] = reaction;
   }
-  writeMap(catalogReactionsKey, map);
+  writeMap(CATALOG_KEY, map);
+
+  const userId = getCurrentUserId();
+  if (userId) {
+    fetchJson<ResponceMsg>('/api/reaction/product/toggle', {
+      method: 'POST',
+      body: JSON.stringify({ userId, productId, type: reaction }),
+    }).catch(() => {});
+  }
+
   return map[userKey]?.[productId] ?? null;
 }
 
 export function getCatalogCounts(productId: number): { likes: number; dislikes: number } {
-  const map = readMap(catalogReactionsKey);
-  let likes = 0;
-  let dislikes = 0;
-  Object.values(map).forEach((userMap) => {
-    if (userMap[productId] === 'like') likes += 1;
-    if (userMap[productId] === 'dislike') dislikes += 1;
+  const map = readMap(CATALOG_KEY);
+  let likes = 0, dislikes = 0;
+  Object.values(map).forEach((um) => {
+    if (um[productId] === 'like') likes++;
+    if (um[productId] === 'dislike') dislikes++;
   });
   return { likes, dislikes };
 }
 
 export function getCatalogUserReaction(productId: number): Reaction | null {
-  const map = readMap(catalogReactionsKey);
-  const userKey = getUserKey();
-  return map[userKey]?.[productId] ?? null;
+  const map = readMap(CATALOG_KEY);
+  return map[getUserKey()]?.[productId] ?? null;
 }
 
 export function toggleFeedReaction(capsuleId: number, reaction: Reaction): Reaction | null {
-  const map = readMap(feedReactionsKey);
+  const map = readMap(FEED_KEY);
   const userKey = getUserKey();
-  const current = map[userKey]?.[capsuleId] ?? null;
   if (!map[userKey]) map[userKey] = {};
-  if (current === reaction) {
+  if (map[userKey][capsuleId] === reaction) {
     delete map[userKey][capsuleId];
   } else {
     map[userKey][capsuleId] = reaction;
   }
-  writeMap(feedReactionsKey, map);
+  writeMap(FEED_KEY, map);
+
+  const userId = getCurrentUserId();
+  if (userId) {
+    fetchJson<ResponceMsg>('/api/reaction/capsule/toggle', {
+      method: 'POST',
+      body: JSON.stringify({ userId, capsuleId, type: reaction }),
+    }).catch(() => {});
+  }
+
   return map[userKey]?.[capsuleId] ?? null;
 }
 
 export function getFeedCounts(capsuleId: number): { likes: number; dislikes: number } {
-  const map = readMap(feedReactionsKey);
-  let likes = 0;
-  let dislikes = 0;
-  Object.values(map).forEach((userMap) => {
-    if (userMap[capsuleId] === 'like') likes += 1;
-    if (userMap[capsuleId] === 'dislike') dislikes += 1;
+  const map = readMap(FEED_KEY);
+  let likes = 0, dislikes = 0;
+  Object.values(map).forEach((um) => {
+    if (um[capsuleId] === 'like') likes++;
+    if (um[capsuleId] === 'dislike') dislikes++;
   });
   return { likes, dislikes };
 }
 
 export function getFeedUserReaction(capsuleId: number): Reaction | null {
-  const map = readMap(feedReactionsKey);
-  const userKey = getUserKey();
-  return map[userKey]?.[capsuleId] ?? null;
+  const map = readMap(FEED_KEY);
+  return map[getUserKey()]?.[capsuleId] ?? null;
 }

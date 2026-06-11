@@ -7,13 +7,16 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/leaflet.css';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Pagination from '../components/common/Pagination';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/myCapsule.module.css';
 import { fetchJson } from '../config/api';
 import { getCurrentUserId } from '../auth/session';
 import { parseCapsuleStorage } from '../utils/file';
 import { uploadFile } from '../utils/upload';
+import { formatCountdown, getContentTypeName } from '../utils/date';
 import ConfirmModal from '../components/ConfirmModal';
+import { useInView } from '../hooks/useInView';
 import type { CapsuleLocationDto, ProductDto, ResponceMsg, TimeCapsuleDto } from '../types/api';
 
 const COVER_PREFIX = '__cover__:';
@@ -26,25 +29,6 @@ const DefaultIcon = L.icon({
   iconAnchor: [12, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
-
-function formatCountdown(target: Date, now: Date): string {
-  const diff = target.getTime() - now.getTime();
-  if (diff <= 0) return 'Открыта';
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const mins = Math.floor((diff / (1000 * 60)) % 60);
-  const secs = Math.floor((diff / 1000) % 60);
-  return `${days}д ${hours}ч ${mins}м ${secs}с`;
-}
-
-function getContentTypeName(type: number): string {
-  switch (type) {
-    case 0: return '📝 Текст';
-    case 1: return '🔗 Ссылка';
-    case 2: return '📁 Файл';
-    default: return '📦 Капсула';
-  }
-}
 
 type EditMeta = {
   product?: ProductDto | null;
@@ -82,6 +66,7 @@ function isLocationDefault(lat: number, lng: number): boolean {
 }
 
 const MyCapsules: React.FC = () => {
+  const { ref: sectionRef, inView: sectionInView } = useInView<HTMLDivElement>(0.1);
   const userId = getCurrentUserId();
   const [items, setItems] = useState<TimeCapsuleDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -284,16 +269,16 @@ const MyCapsules: React.FC = () => {
           </div>
         </div>
 
-        <div className={`${styles.section} ${layout.container}`}>
+        <div ref={sectionRef} className={`${styles.section} ${layout.container} ${layout.fadeInUp} ${sectionInView ? layout.fadeInUpVisible : ''}`}>
           {loading && (
-            <div className={`${styles.loadingState} ${layout.fadeIn}`}>
+            <div className={styles.loadingState}>
               <div className={styles.loader} />
               <p className={styles.muted}>Синхронизация с временным потоком...</p>
             </div>
           )}
 
           {error && (
-            <div className={`${styles.errorState} ${layout.fadeIn}`}>
+            <div className={styles.errorState}>
               <div className={styles.errorIcon}>⚠️</div>
               <p>{error}</p>
               <p className={styles.muted} style={{ fontSize: '0.9rem' }}>Проверьте подключение или повторите попытку позже.</p>
@@ -301,7 +286,7 @@ const MyCapsules: React.FC = () => {
           )}
 
           {!loading && !error && sorted.length === 0 && (
-            <div className={`${styles.emptyState} ${layout.fadeIn}`}>
+            <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>⏳</div>
               <p>Здесь пока пусто</p>
               <p className={styles.emptyHint}>Вы еще не создали ни одной капсулы времени. Самое время оставить послание в будущее!</p>
@@ -314,7 +299,7 @@ const MyCapsules: React.FC = () => {
             const sealed = open.getTime() > now.getTime();
             
             return (
-              <div key={c.id} className={`${styles.card} ${layout.fadeIn}`}>
+              <div key={c.id} className={styles.card}>
                 <div className={styles.cardHeader}>
                   <h2>{c.title || 'Без названия'}</h2>
                   <span className={`${styles.badge} ${sealed ? styles.badgeSealed : styles.badgeOpen}`}>
@@ -679,29 +664,7 @@ const MyCapsules: React.FC = () => {
             );
           })}
 
-          {!loading && !error && sorted.length > pageSize && (
-            <div className={styles.pagination}>
-              <button 
-                type="button" 
-                className={layout.btnPrimary} 
-                disabled={pageIndex <= 1} 
-                onClick={() => { setPageIndex((p) => p - 1); window.scrollTo(0, 0); }}
-                style={{padding: '0.5rem 1.8rem'}}
-              >
-                Назад
-              </button>
-              <span className={styles.pageInfo}>{pageIndex} / {totalPages}</span>
-              <button 
-                type="button" 
-                className={layout.btnPrimary} 
-                disabled={pageIndex >= totalPages} 
-                onClick={() => { setPageIndex((p) => p + 1); window.scrollTo(0, 0); }}
-                style={{padding: '0.5rem 1.8rem'}}
-              >
-                Вперёд
-              </button>
-            </div>
-          )}
+          {!loading && !error && sorted.length > pageSize && <Pagination page={pageIndex} totalPages={totalPages} onPageChange={(p) => { setPageIndex(p); window.scrollTo(0, 0); }} />}
         </div>
       </main>
       <ConfirmModal

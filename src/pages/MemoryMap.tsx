@@ -15,8 +15,11 @@ import type { CapsuleLocationDto, TimeCapsuleDto, UserAccountDto } from '../type
 import ConfirmModal from '../components/ConfirmModal';
 import { getCurrentUserId } from '../auth/session';
 import { getCapsuleThumbnailUrl } from '../utils/file';
+import { useInView } from '../hooks/useInView';
 
 const MemoryMap: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: sectionRef, inView: sectionInView } = useInView<HTMLDivElement>(0.15);
   const [locations, setLocations] = useState<CapsuleLocationDto[]>([]);
   const [capsules, setCapsules] = useState<TimeCapsuleDto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -126,12 +129,12 @@ const MemoryMap: React.FC = () => {
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
         <main className={layout.mainContent}>
-        <div className={styles.pageHeader}>
-          <h1 className={layout.fadeIn}>География Памяти</h1>
-          <p className={layout.fadeIn}>Исследуйте капсулы времени, оставленные в самых значимых уголках мира.</p>
+        <div ref={headerRef} className={`${styles.pageHeader} ${layout.fadeInUp} ${headerInView ? layout.fadeInUpVisible : ''}`}>
+          <h1>География Памяти</h1>
+          <p>Исследуйте капсулы времени, оставленные в самых значимых уголках мира.</p>
         </div>
 
-        <div className={`${styles.section} ${layout.container}`}>
+        <div ref={sectionRef} className={`${styles.section} ${layout.container} ${layout.fadeInUp} ${sectionInView ? layout.fadeInUpVisible : ''}`}>
           {loading && (
             <div className={styles.loadingState}>
               <div className={styles.loader} />
@@ -146,7 +149,7 @@ const MemoryMap: React.FC = () => {
           )}
 
           {!loading && !error && (
-            <div className={layout.fadeIn}>
+            <div>
               <p className={styles.muted}>
                 Ваши воспоминания привязаны к реальности. Капсулы становятся доступны, когда вы находитесь рядом.
               </p>

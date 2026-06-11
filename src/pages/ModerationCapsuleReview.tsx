@@ -3,14 +3,17 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CapsuleContentPreview from '../components/CapsuleContentPreview';
+import SenderInfo from '../components/capsule/SenderInfo';
 
 import layout from '../styles/layout.module.css';
 import detail from '../styles/CapsuleDetail.module.css';
 import { fetchJson } from '../config/api';
 import type { ResponceMsg, TimeCapsuleDto } from '../types/api';
 import { parseCapsuleStorage, isImageSource, resolveMediaUrl } from '../utils/file';
+import { useInView } from '../hooks/useInView';
 
 const ModerationCapsuleReview: React.FC = () => {
+  const { ref: mainRef, inView: mainInView } = useInView<HTMLDivElement>(0.15);
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const capsuleId = Number(params.get('capsuleId') || 0);
@@ -39,26 +42,24 @@ const ModerationCapsuleReview: React.FC = () => {
   return (
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-      <main className={`${layout.mainContent} ${layout.fadeIn}`}>
+      <main ref={mainRef} className={`${layout.mainContent} ${layout.fadeInUp} ${mainInView ? layout.fadeInUpVisible : ''}`}>
         <div className={layout.container} style={{ maxWidth: 800, margin: '2rem auto', padding: '0 5%' }}>
           {!capsule && <div className={layout.textCenter}>Загрузка капсулы...</div>}
-          {capsule && (
+              {capsule && (
             <article className={detail.letterEnvelope}>
               <div className={detail.letterHeader}>
-                <div className={detail.senderInfo}>
-                  <img
-                    src={'/assets/default-avatar.svg'}
-                    alt=""
-                    className={detail.avatarLarge}
-                    onError={(e) => { e.currentTarget.src = '/assets/default-avatar.svg'; }}
-                  />
-                  <div className={detail.senderMeta}>
-                    <span className={detail.author}>{capsule.ownerDisplayName || 'Аноним'}</span>
-                    <span className={detail.createdAt}>
-                      {new Date(capsule.createdAtUtc).toLocaleString('ru-RU', { dateStyle: 'medium', timeStyle: 'short' })}
-                    </span>
-                  </div>
-                </div>
+                <SenderInfo
+                  ownerUserId={capsule.ownerUserId}
+                  ownerDisplayName={capsule.ownerDisplayName}
+                  createdAtUtc={capsule.createdAtUtc}
+                  classes={{
+                    root: detail.senderInfo,
+                    avatar: detail.avatarLarge,
+                    meta: detail.senderMeta,
+                    author: detail.author,
+                    createdAt: detail.createdAt,
+                  }}
+                />
                 <h1 className={detail.title}>{capsule.title}</h1>
               </div>
 

@@ -1,17 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import Pagination from '../components/common/Pagination';
+import FeedMessageRow from '../components/feed/FeedMessageRow';
 import layout from '../styles/layout.module.css';
 import feed from '../styles/PublicFeed.module.css';
 import spinner from '../styles/loading.module.css';
 import { fetchJson } from '../config/api';
 import type { ModerationReportDto, ResponceMsg, TimeCapsuleDto } from '../types/api';
 import { getFeedCounts, getFeedUserReaction, toggleFeedReaction } from '../auth/reactions';
-import { isImageSource, parseCapsuleStorage, resolveMediaUrl, resolveUserAvatar } from '../utils/file';
-import { getAvatarByUserId } from '../auth/avatar';
-import CapsuleContentPreview from '../components/CapsuleContentPreview';
 import { getCurrentUserEmail } from '../auth/session';
+import { useInView } from '../hooks/useInView';
 
 interface SortState {
   date: 'newest' | 'oldest' | null;
@@ -20,6 +19,9 @@ interface SortState {
 }
 
 const PublicFeed: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: sortRef, inView: sortInView } = useInView<HTMLDivElement>(0.2);
+
   const [items, setItems] = useState<TimeCapsuleDto[]>([]);
   const [likes, setLikes] = useState<Record<number, number>>({});
   const [dislikes, setDislikes] = useState<Record<number, number>>({});
@@ -141,7 +143,7 @@ const PublicFeed: React.FC = () => {
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
         <main className={`${layout.mainContent} ${layout.fadeIn} ${feed.feedBackdrop}`}>
-        <div className={feed.pageHeader}>
+        <div ref={headerRef} className={`${feed.pageHeader} ${feed.fadeInUp} ${headerInView ? feed.fadeInUpVisible : ''}`}>
           <h1 className={layout.textGradient}>Публичные воспоминания</h1>
           <p>Общая лента открытых капсул — делитесь моментами прошлого.</p>
         </div>
@@ -161,120 +163,24 @@ const PublicFeed: React.FC = () => {
             <div className={feed.chatTimeline}>
               {!loadingFeed &&
                 !error &&
-                paged.map((c) => (
-                  <div key={c.id} className={feed.messageRow}>
-                    <div className={feed.avatarSpace}>
-                      <img
-                        src={getAvatarByUserId(c.ownerUserId) || resolveUserAvatar(c.ownerUserId, c.ownerDisplayName)}
-                        alt="avatar"
-                        className={feed.chatAvatar}
-                        onError={(e) => {
-                          e.currentTarget.src = '/assets/default-avatar.svg';
-                        }}
-                      />
-                    </div>
-
-                    <div className={feed.messageBubble}>
-                      <div className={feed.messageInfo}>
-                        <span className={feed.authorName}>{c.ownerDisplayName || 'Аноним'}</span>
-                        <span className={feed.userTag}>Участник</span>
-                        <span className={feed.messageTime}>
-                          {new Date(c.createdAtUtc).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        <button type="button" className={feed.reportTrigger} onClick={() => setReportTarget(c)}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
-                            <line x1="4" y1="22" x2="4" y2="15" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className={feed.messageContent}>
-                        <h2 className={feed.capsuleTitle}>{c.title}</h2>
-                        <p className={feed.capsuleText}>
-                          {c.previewText || 'Внутри этой капсулы находится ценное воспоминание.'}
-                        </p>
-
-                        {c.contentType === 1 && <CapsuleContentPreview capsule={c} />}
-                        {c.contentType === 2 && (() => {
-                          const parsed = parseCapsuleStorage(c.fileStoragePath);
-                          const cover = parsed.cover;
-                          if (cover && isImageSource(cover)) {
-                            return (
-                              <div className={feed.messageAttachment}>
-                                <img
-                                  src={resolveMediaUrl(cover, '/assets/default-capsule-cover.svg')}
-                                  alt="preview"
-                                  className={feed.attachImg}
-                                  loading="lazy"
-                                />
-                              </div>
-                            );
-                          }
-                          return null;
-                        })()}
-
-                        {(c.contentType === 0 || c.contentType === 1) && isImageSource(c.fileStoragePath) && (
-                          <div className={feed.messageAttachment}>
-                            <img
-                              src={resolveMediaUrl(c.fileStoragePath, '/assets/default-capsule-cover.svg')}
-                              alt="content"
-                              className={feed.attachImg}
-                              loading="lazy"
-                            />
-                          </div>
-                        )}
-
-                      </div>
-
-                      <div className={feed.messageFooter}>
-                        <div className={feed.reactionsInline}>
-                          <button
-                            type="button"
-                            className={`${feed.reactIconBtn} ${userReactions[c.id] === 'like' ? feed.activeLike : ''}`}
-                            onClick={() => react(c.id, 'like')}
-                          >
-                            <span className={feed.emoji}>👍</span>
-                            <span className={feed.count}>{likes[c.id] ?? 0}</span>
-                          </button>
-                          <button
-                            type="button"
-                            className={`${feed.reactIconBtn} ${userReactions[c.id] === 'dislike' ? feed.activeDislike : ''}`}
-                            onClick={() => react(c.id, 'dislike')}
-                          >
-                            <span className={feed.emoji}>👎</span>
-                            <span className={feed.count}>{dislikes[c.id] ?? 0}</span>
-                          </button>
-                        </div>
-                        <Link to={`/feed-capsule/${c.id}?source=feed`} className={feed.unpackBtn}>
-                          Распаковать
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+                paged.map((c, i) => (
+                  <FeedMessageRow
+                    key={c.id}
+                    capsule={c}
+                    likes={likes[c.id] ?? 0}
+                    dislikes={dislikes[c.id] ?? 0}
+                    userReaction={userReactions[c.id] ?? null}
+                    onReact={react}
+                    onReport={(c) => setReportTarget(c)}
+                    delay={((i % 4) + 1) * 100}
+                  />
                 ))}
             </div>
 
-            {!loadingFeed && totalPages > 1 && (
-              <div className={feed.paginationMini}>
-                <button type="button" disabled={pageIndex <= 1} onClick={() => setPageIndex((p) => p - 1)}>
-                  Назад
-                </button>
-                <span>
-                  {pageIndex} / {totalPages}
-                </span>
-                <button
-                  type="button"
-                  disabled={pageIndex >= totalPages}
-                  onClick={() => setPageIndex((p) => p + 1)}
-                >
-                  Вперёд
-                </button>
-              </div>
-            )}
+            {!loadingFeed && totalPages > 1 && <Pagination page={pageIndex} totalPages={totalPages} onPageChange={setPageIndex} />}
           </div>
 
-          <aside className={feed.sortPanel}>
+          <aside ref={sortRef} className={`${feed.sortPanel} ${feed.fadeInUp} ${feed.delay200} ${sortInView ? feed.fadeInUpVisible : ''}`}>
             <div className={feed.sortPanelInner}>
               <h3 className={feed.sortPanelTitle}>Сортировка</h3>
 

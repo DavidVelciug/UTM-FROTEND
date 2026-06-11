@@ -2,24 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import SenderInfo from '../components/capsule/SenderInfo';
+import LockedCapsuleModal from '../components/capsule/LockedCapsuleModal';
 import layout from '../styles/layout.module.css';
 import detail from '../styles/CapsuleDetail.module.css';
 import { fetchJson } from '../config/api';
 import type { TimeCapsuleDto } from '../types/api';
 import { getCurrentUserId } from '../auth/session';
 import { addOpenedCapsule } from '../auth/capsuleStore';
-import { parseCapsuleStorage, isImageSource, isVideoSource, isAudioSource, resolveMediaUrl, resolveUserAvatar } from '../utils/file';
-import { getAvatarByUserId } from '../auth/avatar';
-
-function formatCountdown(target: Date, now: Date): string {
-  const diff = target.getTime() - now.getTime();
-  if (diff <= 0) return 'Можно открыть';
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const mins = Math.floor((diff / (1000 * 60)) % 60);
-  const secs = Math.floor((diff / 1000) % 60);
-  return `${days}д ${hours}ч ${mins}м ${secs}с`;
-}
+import { parseCapsuleStorage, isImageSource, isVideoSource, isAudioSource, resolveMediaUrl } from '../utils/file';
+import { useInView } from '../hooks/useInView';
 
 const sourceLabel: Record<string, string> = {
   catalog: 'Капсула каталога',
@@ -29,6 +21,7 @@ const sourceLabel: Record<string, string> = {
 };
 
 const FeedCapsuleView: React.FC = () => {
+  const { ref: mainRef, inView: mainInView } = useInView<HTMLDivElement>(0.15);
   const { capsuleId } = useParams<{ capsuleId: string }>();
   const [searchParams] = useSearchParams();
   const source = searchParams.get('source') || (searchParams.has('price') ? 'catalog' : 'feed');
@@ -55,37 +48,27 @@ const FeedCapsuleView: React.FC = () => {
       .catch(() => setCapsule(null));
   }, [capsuleId, userId, source]);
 
-  const avatarSrc =
-    capsule ? getAvatarByUserId(capsule.ownerUserId) || resolveUserAvatar(capsule.ownerUserId, capsule.ownerDisplayName) : '';
-
   return (
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-        <main className={`${layout.mainContent} ${layout.fadeIn}`}>
+        <main ref={mainRef} className={`${layout.mainContent} ${layout.fadeInUp} ${mainInView ? layout.fadeInUpVisible : ''}`}>
         <div className={`${layout.container} ${detail.wrap}`}>
           {!capsule && <div>Капсула не найдена.</div>}
           {capsule && (
             <article className={detail.letterEnvelope}>
               <div className={detail.letterHeader}>
-                <div className={detail.senderInfo}>
-                  <img
-                    src={avatarSrc}
-                    alt=""
-                    className={detail.avatarLarge}
-                    onError={(e) => {
-                      e.currentTarget.src = '/assets/default-avatar.svg';
-                    }}
-                  />
-                  <div className={detail.senderMeta}>
-                    <span className={detail.author}>{capsule.ownerDisplayName || 'Аноним'}</span>
-                    <span className={detail.createdAt}>
-                      {new Date(capsule.createdAtUtc).toLocaleString('ru-RU', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      })}
-                    </span>
-                  </div>
-                </div>
+                <SenderInfo
+                  ownerUserId={capsule.ownerUserId}
+                  ownerDisplayName={capsule.ownerDisplayName}
+                  createdAtUtc={capsule.createdAtUtc}
+                  classes={{
+                    root: detail.senderInfo,
+                    avatar: detail.avatarLarge,
+                    meta: detail.senderMeta,
+                    author: detail.author,
+                    createdAt: detail.createdAt,
+                  }}
+                />
                 <h1 className={detail.title}>{capsule.title}</h1>
                 {hasPrice && (
                   <div style={{ marginTop: 10, fontWeight: 800, fontSize: '1.3rem', color: '#fff', background: 'linear-gradient(135deg, #e57373, #c62828)', display: 'inline-block', padding: '6px 18px', borderRadius: 999 }}>
@@ -231,32 +214,7 @@ const FeedCapsuleView: React.FC = () => {
               )}
             </article>
           )}
-          {capsule?.isLocked && (
-            <div
-              style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.6)',
-                display: 'grid',
-                placeItems: 'center',
-                zIndex: 1000,
-              }}
-            >
-              <div
-                style={{
-                  width: 'min(520px, 92vw)',
-                  background: 'var(--surface-light)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '24px',
-                  padding: '1.75rem',
-                }}
-              >
-                <h2>Ждите время</h2>
-                <p className={detail.bodyText}>Получатель не может открыть капсулу раньше указанного времени.</p>
-                <p className={detail.lockedBanner}>До открытия: {formatCountdown(new Date(capsule.openAtUtc), now)}</p>
-              </div>
-            </div>
-          )}
+          {capsule?.isLocked && <LockedCapsuleModal openAtUtc={capsule.openAtUtc} now={now} />}
         </div>
       </main>
       <Footer />

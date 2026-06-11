@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import layout from '../styles/layout.module.css';
@@ -11,8 +12,10 @@ import { getAvatar, setAvatar } from '../auth/avatar';
 import type { ResponceMsg, UserAccountDto } from '../types/api';
 import { resolveMediaUrl } from '../utils/file';
 import { uploadFile } from '../utils/upload';
+import { useInView } from '../hooks/useInView';
 
 const ProfileSettings: React.FC = () => {
+  const { ref: mainRef, inView: mainInView } = useInView<HTMLDivElement>(0.2);
   const userId = getCurrentUserId();
   const [user, setUser] = useState<UserAccountDto | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,7 +65,7 @@ const ProfileSettings: React.FC = () => {
   return (
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
-        <main className={`${layout.mainContent} ${layout.fadeIn}`}>
+        <main ref={mainRef} className={`${layout.mainContent} ${layout.fadeInUp} ${mainInView ? layout.fadeInUpVisible : ''}`}>
         <div className={page.pageHeader}>
           <h1 className={layout.textGradient}>Настройки профиля</h1>
           <p>Ваше личное пространство в Memory Lane.</p>
@@ -73,7 +76,20 @@ const ProfileSettings: React.FC = () => {
               <div className={spinner.loader} />
             </div>
           )}
-          {error && <div className={spinner.errorState}>{error}</div>}
+          {error && !userId && (
+            <div className={profile.authPrompt}>
+              <div className={profile.authPromptIcon}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <h2 className={profile.authPromptTitle}>Доступ ограничен</h2>
+              <p className={profile.authPromptText}>Войдите в аккаунт, чтобы управлять настройками профиля, загружать аватар и изменять личные данные.</p>
+              <Link to="/login" className={profile.authPromptBtn}>Перейти ко входу</Link>
+            </div>
+          )}
+          {error && userId && <div className={spinner.errorState}>{error}</div>}
           
           {user && (
             <form className={profile.settingsFormContainer} onSubmit={save}>

@@ -1,18 +1,22 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Pagination from '../components/common/Pagination';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/adminUsers.module.css';
 import { fetchJson } from '../config/api';
 import { getAvatarByUserId } from '../auth/avatar';
 import { resolveUserAvatar } from '../utils/file';
 import type { ResponceMsg, UserAccountDto } from '../types/api';
+import { useInView } from '../hooks/useInView';
 
 type SortMode = 'newest' | 'oldest' | 'name-asc';
 type SearchMode = 'name' | 'email';
 type EditableRole = 'user' | 'moderator';
 
 const AdminUsers: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: sectionRef, inView: sectionInView } = useInView<HTMLDivElement>(0.15);
   const [users, setUsers] = useState<UserAccountDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -80,13 +84,13 @@ const AdminUsers: React.FC = () => {
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
         <main className={layout.mainContent}>
-        <div className={styles.pageHeader}>
-          <h1 className={layout.fadeIn}>Управление пользователями</h1>
-          <p className={layout.fadeIn}>Администрирование ролей, поиск и фильтрация участников сообщества.</p>
+        <div ref={headerRef} className={`${styles.pageHeader} ${layout.fadeInUp} ${headerInView ? layout.fadeInUpVisible : ''}`}>
+          <h1>Управление пользователями</h1>
+          <p>Администрирование ролей, поиск и фильтрация участников сообщества.</p>
         </div>
 
         <div className={`${styles.section} ${layout.container}`}>
-          <div className={`${styles.card} ${layout.fadeIn}`}>
+          <div className={styles.card}>
             <div className={styles.row}>
               <input
                 className={styles.input}
@@ -118,7 +122,7 @@ const AdminUsers: React.FC = () => {
           {message && <div className={styles.card} style={{borderColor: 'var(--ml-primary-color)', textAlign: 'center'}}>{message}</div>}
 
           {!loading && !error && (
-            <div className={layout.fadeIn}>
+            <div ref={sectionRef} className={`${layout.fadeInUp} ${sectionInView ? layout.fadeInUpVisible : ''}`}>
               {pagedUsers.map((u) => (
                 <article key={u.id} className={styles.card}>
                   <div className={styles.userRow}>
@@ -151,17 +155,7 @@ const AdminUsers: React.FC = () => {
                 </article>
               ))}
 
-              {visibleUsers.length > pageSize && (
-                <div className={styles.pagination}>
-                  <button type="button" className={layout.btnPrimary} disabled={pageIndex <= 1} onClick={() => setPageIndex((p) => p - 1)}>
-                    Назад
-                  </button>
-                  <span className={styles.muted}>Страница {pageIndex} из {Math.ceil(visibleUsers.length / pageSize)}</span>
-                  <button type="button" className={layout.btnPrimary} disabled={pageIndex >= Math.ceil(visibleUsers.length / pageSize)} onClick={() => setPageIndex((p) => p + 1)}>
-                    Вперед
-                  </button>
-                </div>
-              )}
+              {visibleUsers.length > pageSize && <Pagination page={pageIndex} totalPages={Math.ceil(visibleUsers.length / pageSize)} onPageChange={setPageIndex} />}
 
               {visibleUsers.length === 0 && (
                 <div className={styles.errorState}>

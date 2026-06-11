@@ -2,12 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Pagination from '../components/common/Pagination';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/openedCapsules.module.css';
 import { getOpenedCapsules, type OpenedCapsuleItem } from '../auth/capsuleStore';
 import { fetchJson } from '../config/api';
 import { getCurrentUserId } from '../auth/session';
 import type { ProductDto } from '../types/api';
+import { useInView } from '../hooks/useInView';
 
 const contentTypeLabels: Record<number, string> = {
   0: 'Текстовая',
@@ -33,6 +35,8 @@ const normalizeItems = (items: OpenedCapsuleItem[]): OpenedCapsuleItem[] =>
   }));
 
 const OpenedCapsules: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: sectionRef, inView: sectionInView } = useInView<HTMLDivElement>(0.15);
   const userId = getCurrentUserId();
   const [items, setItems] = useState(normalizeItems(getOpenedCapsules()));
   const [loading, setLoading] = useState(true);
@@ -106,12 +110,12 @@ const OpenedCapsules: React.FC = () => {
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
         <main className={layout.mainContent}>
-        <div className={styles.pageHeader}>
-          <h1 className={layout.fadeIn}>Открытые капсулы</h1>
-          <p className={layout.fadeIn}>Ваша персональная коллекция воспоминаний. Здесь хранятся все капсулы, которые вы когда-либо распаковали.</p>
+        <div ref={headerRef} className={`${styles.pageHeader} ${layout.fadeInUp} ${headerInView ? layout.fadeInUpVisible : ''}`}>
+          <h1>Открытые капсулы</h1>
+          <p>Ваша персональная коллекция воспоминаний. Здесь хранятся все капсулы, которые вы когда-либо распаковали.</p>
         </div>
 
-        <div className={`${styles.section} ${layout.container}`}>
+        <div ref={sectionRef} className={`${styles.section} ${layout.container} ${layout.fadeInUp} ${sectionInView ? layout.fadeInUpVisible : ''}`}>
           {loading ? (
             <div className={styles.loadingState}>
               <div className={styles.loader} />
@@ -184,7 +188,7 @@ const OpenedCapsules: React.FC = () => {
                     </div>
                   ) : (
                     <>
-                      <div className={`${styles.grid} ${layout.fadeIn}`}>
+                      <div className={styles.grid}>
                           {paginatedItems.map((item) => (
                           <article key={item.id} className={styles.card}>
                             <div className={styles.cardImage}>
@@ -209,33 +213,7 @@ const OpenedCapsules: React.FC = () => {
                           ))}
                       </div>
 
-                      {sortedAndFiltered.length > pageSize && (
-                        <div className={styles.pagination}>
-                          <button 
-                            type="button" 
-                            className={layout.btnPrimary} 
-                            disabled={pageIndex <= 1} 
-                            onClick={() => {
-                              setPageIndex((p) => p - 1);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                          >
-                            Назад
-                          </button>
-                          <span className={styles.pageNumber}>{pageIndex} / {totalPages}</span>
-                          <button 
-                            type="button" 
-                            className={layout.btnPrimary} 
-                            disabled={pageIndex >= totalPages} 
-                            onClick={() => {
-                              setPageIndex((p) => p + 1);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                            }}
-                          >
-                            Вперед
-                          </button>
-                        </div>
-                      )}
+                      {sortedAndFiltered.length > pageSize && <Pagination page={pageIndex} totalPages={totalPages} onPageChange={(p) => { setPageIndex(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />}
                     </>
                   )}
                 </>

@@ -6,10 +6,16 @@ import layout from '../styles/layout.module.css';
 import styles from '../styles/Landing.module.css';
 import { fetchJson } from '../config/api';
 import { legacyAsset } from '../utils/legacyAsset';
+import { useInView } from '../hooks/useInView';
 
 const Landing: React.FC = () => {
   const [createdTotal, setCreatedTotal] = useState<number | null>(null);
   const [openedTotal, setOpenedTotal] = useState<number | null>(null);
+
+  const { ref: heroRef, inView: heroInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: statsRef, inView: statsInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: featTitleRef, inView: featTitleInView } = useInView<HTMLHeadingElement>(0.15);
+  const { ref: featGridRef, inView: featGridInView } = useInView<HTMLDivElement>(0.1);
 
   const demoImages = [
     'src/assets/landing/photo4.png',
@@ -53,12 +59,12 @@ const Landing: React.FC = () => {
       <main className={layout.mainContent}>
         <section className={styles.heroSection}>
           <div className={styles.heroContainer}>
-            <div className={styles.heroContent}>
-              <h1 className={styles.heroTitle}>Письма в будущее</h1>
-              <p className={styles.heroDescription}>
+            <div ref={heroRef} className={styles.heroContent}>
+              <h1 className={`${styles.heroTitle} ${styles.fadeInUp} ${heroInView ? styles.fadeInUpVisible : ''}`}>Письма в будущее</h1>
+              <p className={`${styles.heroDescription} ${styles.fadeInUp} ${styles.delay100} ${heroInView ? styles.fadeInUpVisible : ''}`}>
                 Создайте цифровое наследие, которое откроется в нужный момент. Сохраните воспоминания для близких.
               </p>
-              <div className={styles.heroStats}>
+              <div ref={statsRef} className={`${styles.heroStats} ${styles.fadeInUp} ${styles.delay200} ${statsInView ? styles.fadeInUpVisible : ''}`}>
                 <div className={styles.statItem}>
                   <strong>{fmt(createdTotal)}</strong>
                   <span>Создано капсул</span>
@@ -68,7 +74,7 @@ const Landing: React.FC = () => {
                   <span>Уже открыто</span>
                 </div>
               </div>
-              <div className={styles.heroButtonContainer}>
+              <div className={`${styles.heroButtonContainer} ${styles.fadeInUp} ${styles.delay300} ${heroInView ? styles.fadeInUpVisible : ''}`}>
                 <Link to="/catalog" className={layout.btnPrimaryLarge}>
                   Перейти к каталогу
                 </Link>
@@ -96,10 +102,10 @@ const Landing: React.FC = () => {
         </section>
 
         <section className={styles.featuresSection}>
-          <h2>Как это работает</h2>
-          <div className={styles.featuresGrid}>
+          <h2 ref={featTitleRef} className={`${styles.fadeInUp} ${featTitleInView ? styles.fadeInUpVisible : ''}`}>Как это работает</h2>
+          <div ref={featGridRef} className={styles.featuresGrid}>
             {features.map((f, i) => (
-              <div key={i} className={styles.featureCard3D}>
+              <div key={i} className={`${styles.featureCard3D} ${styles.fadeInUp} ${styles[`delay${(i + 1) * 100}`]} ${featGridInView ? styles.fadeInUpVisible : ''}`}>
                 <div className={styles.cardInner}>
                   <div className={styles.layerBase}></div>
                   <div className={styles.layerGlow}></div>

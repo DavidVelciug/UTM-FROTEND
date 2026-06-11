@@ -15,6 +15,7 @@ import { getCurrentUserId } from '../auth/session';
 import type { CapsuleContentType, CategoryDto, ProductDto, ResponceMsg, TimeCapsuleDto } from '../types/api';
 import { resolveMediaUrl } from '../utils/file';
 import { uploadFile } from '../utils/upload';
+import { useInView } from '../hooks/useInView';
 
 const COVER_PREFIX = '__cover__:';
 
@@ -41,6 +42,8 @@ const LocationPicker: React.FC<LocationPickerProps> = ({ onPick }) => {
 };
 
 const CreateCapsule: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: formRef, inView: formInView } = useInView<HTMLDivElement>(0.15);
   const userId = getCurrentUserId();
   const [contentType, setContentType] = useState<CapsuleContentType>(0);
   const [title, setTitle] = useState('');
@@ -200,12 +203,12 @@ const CreateCapsule: React.FC = () => {
     <div className={`${layout.pageWrapper} ${styles.beautifyPage} ${layout.withBg}`}>
       <Header />
         <main className={`${layout.mainContent} ${styles.fadeInPage}`}>
-        <div className={`${page.pageHeader} ${styles.aestheticHeader}`}>
+        <div ref={headerRef} className={`${page.pageHeader} ${styles.aestheticHeader} ${layout.fadeInUp} ${headerInView ? layout.fadeInUpVisible : ''}`}>
           <h1 className={styles.gradientTitle}>Создание капсулы</h1>
           <p className={styles.subtitle}>Запечатайте сообщение, добавьте место на карте и откройте его в будущем.</p>
         </div>
 
-        <div className={`${page.section} ${styles.formSection}`}>
+        <div ref={formRef} className={`${page.section} ${styles.formSection} ${layout.fadeInUp} ${formInView ? layout.fadeInUpVisible : ''}`}>
           <div className={`${styles.createCapsuleCard} ${styles.popInCard}`}>
             <div className={styles.heroPanel}>
               <h2>Новая капсула</h2>

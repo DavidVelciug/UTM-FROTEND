@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import Pagination from '../components/common/Pagination';
 import layout from '../styles/layout.module.css';
 import styles from '../styles/adminModeration.module.css';
 import { fetchJson } from '../config/api';
@@ -10,8 +11,11 @@ import { getCurrentUserEmail } from '../auth/session';
 import { resolveMediaUrl } from '../utils/file';
 import type { ModerationReportDto, ProductDto, ResponceMsg, TimeCapsuleDto } from '../types/api';
 import ConfirmModal from '../components/ConfirmModal';
+import { useInView } from '../hooks/useInView';
 
 const AdminModeration: React.FC = () => {
+  const { ref: headerRef, inView: headerInView } = useInView<HTMLDivElement>(0.2);
+  const { ref: contentRef, inView: contentInView } = useInView<HTMLDivElement>(0.15);
   const [capsules, setCapsules] = useState<TimeCapsuleDto[]>([]);
   const [reports, setReports] = useState<ModerationReportDto[]>([]);
   const [catalogItems, setCatalogItems] = useState<ProductDto[]>([]);
@@ -107,10 +111,10 @@ const AdminModeration: React.FC = () => {
     <div className={`${layout.pageWrapper} ${layout.withBg}`}>
       <Header />
         <main className={layout.mainContent}>
-        <div className={styles.pageHeader}>
-          <h1 className={layout.fadeIn}>Модерация</h1>
-          <p className={layout.fadeIn}>Эстетичная панель управления безопасностью и контентом платформы.</p>
-          <div className={`${styles.tabContainer} ${layout.fadeIn}`}>
+        <div ref={headerRef} className={`${styles.pageHeader} ${layout.fadeInUp} ${headerInView ? layout.fadeInUpVisible : ''}`}>
+          <h1>Модерация</h1>
+          <p>Эстетичная панель управления безопасностью и контентом платформы.</p>
+          <div className={styles.tabContainer}>
             <button className={`${styles.tabBtn} ${tab === 'reports' ? styles.activeTab : ''}`} onClick={() => setTab('reports')}>Жалобы ({reports.length})</button>
             <button className={`${styles.tabBtn} ${tab === 'public' ? styles.activeTab : ''}`} onClick={() => setTab('public')}>Публикации ({publicCapsules.length})</button>
             <button className={`${styles.tabBtn} ${tab === 'catalog' ? styles.activeTab : ''}`} onClick={() => setTab('catalog')}>Каталог ({catalogItems.length})</button>
@@ -128,7 +132,7 @@ const AdminModeration: React.FC = () => {
           {error && <div className={styles.errorState}><h3>Упс!</h3><p>{error}</p></div>}
           
           {!loading && !error && (
-            <div className={layout.fadeIn}>
+            <div ref={contentRef} className={`${layout.fadeInUp} ${contentInView ? layout.fadeInUpVisible : ''}`}>
               {tab === 'reports' && (
                 <div className={styles.grid}>
                   {reports.length === 0 && <div className={styles.card} style={{gridColumn: '1/-1', textAlign: 'center'}}>Жалоб пока нет</div>}
@@ -206,19 +210,12 @@ const AdminModeration: React.FC = () => {
                 </div>
               )}
 
-              <div className={styles.pagination}>
-                <button className={layout.btnPrimary} onClick={() => {
-                   if(tab==='reports') setReportsPage(p=>p-1);
-                   if(tab==='public') setPublicPage(p=>p-1);
-                   if(tab==='catalog') setCatalogPage(p=>p-1);
-                }} disabled={tab==='reports'?reportsPage<=1:tab==='public'?publicPage<=1:catalogPage<=1}>←</button>
-                <span className={styles.muted}>Page {tab==='reports'?reportsPage:tab==='public'?publicPage:catalogPage}</span>
-                <button className={layout.btnPrimary} onClick={() => {
-                   if(tab==='reports') setReportsPage(p=>p+1);
-                   if(tab==='public') setPublicPage(p=>p+1);
-                   if(tab==='catalog') setCatalogPage(p=>p+1);
-                }} disabled={tab==='reports'?reportsPage>=Math.ceil(reports.length/pageSize):tab==='public'?publicPage>=Math.ceil(publicCapsules.length/pageSize):catalogPage>=Math.ceil(catalogItems.length/pageSize)}>→</button>
-              </div>
+              {(() => {
+                const page = tab === 'reports' ? reportsPage : tab === 'public' ? publicPage : catalogPage;
+                const total = tab === 'reports' ? Math.ceil(reports.length / pageSize) : tab === 'public' ? Math.ceil(publicCapsules.length / pageSize) : Math.ceil(catalogItems.length / pageSize);
+                const setPage = (p: number) => { if (tab === 'reports') setReportsPage(p); else if (tab === 'public') setPublicPage(p); else setCatalogPage(p); };
+                return <Pagination page={page} totalPages={total} onPageChange={setPage} />;
+              })()}
             </div>
           )}
         </div>

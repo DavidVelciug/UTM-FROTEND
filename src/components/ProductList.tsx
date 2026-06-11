@@ -1,10 +1,10 @@
 import React from 'react';
 import ProductCard from './ProductCard';
-import { Product } from '../data/products';
+import type { ProductDto } from '../types/api';
 import styles from '../styles/ProductCard.module.css';
 
 interface ProductListProps {
-  products: Product[];
+  products: ProductDto[];
   likesMap: Record<number, number>;
   dislikesMap: Record<number, number>;
   userReactions: Record<number, 'like' | 'dislike' | null>;
